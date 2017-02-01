@@ -1,0 +1,12 @@
+<h1><a href="index.html" id="logo">Pro Soft</a></h1>
+<nav>
+<ul id="menu">
+<?php $activeId = "id='menu_active'"; ?>
+
+<li <?php if($page === "index") echo $activeId;?>><a href="index.html"><span><span>ホーム</span></span></a></li>
+<li <?php if($page === "Company") echo $activeId;?>><a href="Company.html"><span><span>会社情報</span></span></a></li>
+<li class="nav3" <?php if($page === "Business") echo $activeId;?>><a href="Business.html"><span><span>事業内容</span></span></a></li>
+<li class="nav4" <?php if($page === "Employment") echo $activeId;?>><a href="Employment.html"><span><span>採用情報</span></span></a></li>
+<li class="nav5" <?php if($page === "Contacts") echo $activeId;?>><a href="Contacts.html"><span><span>お問い合わせ</span></span></a></li>
+</ul>
+</nav>
