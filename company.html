@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="jp">
+  <head>
+    <title>公司介绍</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="title" content="公司介绍" />
+    <meta name="description" content="远红外线，温疗仓" />
+    <meta name="keywords" content="远红外线，温疗仓，日本" />
+    <meta name="language" content="中文，chinese" />    
+    <meta name="subject" content="Site subject here" />
+    <meta name="robots" content="All" />
+    <meta name="copyright" content="Your company" />
+    <meta name="abstract" content="Site description here" />
+    <meta name="MSSmartTagsPreventParsing" content="true" />
+    <link id="theme" rel="stylesheet" type="text/css" href="css/detail.css" title="theme" />
+    <link rel="stylesheet" type="text/css" href="css/superfish.css" media="screen" />
+	<script type="text/javascript" src="js/jquery-1.2.6.min.js"></script>
+	<script type="text/javascript" src="js/hoverIntent.js"></script>
+	<script type="text/javascript" src="js/superfish.js"></script>
+    
+	<script type="text/javascript" language="javascript" src="js/addon.js"></script>
+	<script type="text/javascript" language="javascript" src="js/custom.js"></script>
+
+		<script type="text/javascript">
+
+		// initialise plugins
+		jQuery(function(){
+			//jQuery('ul.sf-menu').superfish();
+		});
+
+		</script>
+
+  </head>
+  <body> 
+    <!-- top wrapper -->  
+    <div id="topWrapper"> 
+      <div id="topBanner"></div> 
+    </div>  
+
+<?php $page="company.html"; include "menu.php";?>
+
+    <!-- end top wrapper -->  
+    <div id="wrapper">
+    	
+      <div id="container">      
+        <!--  content -->
+
+        	<div id="banner">
+				<h3>会社介绍</h3>
+				<ul>
+					<li><a href="company.html?submenu=greeting">董事长致词</a></li>
+					<li><a href="company.html?submenu=companyinfo">会社概要</a></li>
+					<li><a href="company.html?submenu=companyinfo">事业概要</a></li>
+				</ul>				
+        	</div>
+
+        
+        <div id="content">
+<!-- News -->
+
+<?php include($_GET['submenu'].'.html');?>
+
+          <div class="clear"></div> 
+        </div>  
+        <!-- end content -->  
+        <div class="clear" style="height:10px"></div> 
+      </div>  
+      <!-- end container --> 
+    </div>  
+<?php include "footer.php"; ?>
+  </body>
+</html>

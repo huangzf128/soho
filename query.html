@@ -1,0 +1,142 @@
+<?php if(!isset($_SESSION)){
+	session_start();	
+}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="jp">
+  <head>
+    <title>联络我们</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="title" content="联络我们" />
+    <meta name="description" content="远红外线，温疗仓" />
+    <meta name="keywords" content="远红外线，温疗仓，日本" />
+    <meta name="language" content="中文，chinese" />    
+    <meta name="subject" content="Site subject here" />
+    <meta name="robots" content="All" />
+    <meta name="copyright" content="Your company" />
+    <meta name="abstract" content="Site description here" />
+    <meta name="MSSmartTagsPreventParsing" content="true" />
+    <link id="theme" rel="stylesheet" type="text/css" href="css/detail.css" title="theme" />
+    <link rel="stylesheet" type="text/css" href="css/superfish.css" media="screen" />
+	<script type="text/javascript" src="js/jquery-1.2.6.min.js"></script>
+	<script type="text/javascript" src="js/hoverIntent.js"></script>
+	<script type="text/javascript" src="js/superfish.js"></script>
+    
+	<script type="text/javascript" language="javascript" src="js/addon.js"></script>
+	<script type="text/javascript" language="javascript" src="js/custom.js"></script>
+
+		<script type="text/javascript">
+
+		// initialise plugins
+		jQuery(function(){
+			//jQuery('ul.sf-menu').superfish();
+			
+			function msg(){
+				var msg = <?php echo '"'.(isset($_SESSION['result']) ? $_SESSION['result'] :"").'";'; ?>
+				alert(msg);
+			}
+			
+			<?php echo (isset($_SESSION['result']) ? "msg();" :""); ?>
+
+		});
+
+		</script>
+
+  </head>
+  <body> 
+    <!-- top wrapper -->  
+    <div id="topWrapper"> 
+      <div id="topBanner"></div> 
+    </div>  
+
+<?php $page="query.html"; include "menu.php";?>
+
+    <!-- end top wrapper -->  
+    <div id="wrapper">
+    	
+      <div id="container">      
+        <!--  content -->
+
+        	<div id="banner">
+				<h3>联络方式</h3><br/>
+				<div>				
+					株式会社美丽庄园<br/>
+					电话：092-401-1231<br/>
+					传真：092-403-1233<br/>
+					Email：<br/>beautyvillagetm@gmail.com<br/>
+				</div>			
+        	</div>
+        
+        <div id="content">
+<!-- News -->
+<form action="mail/sendMail.php">
+        	<div class="bloc" id="business">
+        	<h3>联系我们</h3>
+        	
+        		<table>
+        				<tr>
+        					<td width="150px">会社名</td>
+        					<td width="500px">
+        						<input type="text" name="companynm"/>
+        					</td>
+        				</tr>
+        				<tr>
+        					<td>电话号码</td>
+        					<td>
+        						<input type="text" name="telephone"/>
+        					</td>
+        				</tr>
+        				<tr>
+        					<td>会社地址</td>
+        					<td>
+        						<input type="text" name="address"/>
+        					</td>
+        				</tr>
+        				<tr>
+        					<td>姓名</td>
+        					<td>
+        						<input type="text" name="name"/>
+        					</td>
+        				</tr>        			
+        				<tr>
+        					<td>手机</td>
+        					<td>
+        						<input type="text" name="mobile"/>
+        					</td>
+        				</tr>        			
+        				<tr>
+        					<td>Email</td>
+        					<td>
+        						<input type="text" name="email"/>
+        					</td>
+        				</tr>        			
+        				<tr>
+        					<td>咨询内容</td>
+        					<td>
+        						<textarea cols="57" rows="25" name="content"></textarea>
+        					</td>
+        				</tr>
+        				<tr>
+        					<td colspan=2 align=center>
+        						<button>送信</button>
+        					</td>
+        				</tr>        			
+        		</table>
+				
+        	</div>
+        	
+</form>
+        	
+
+          <div class="clear"></div> 
+        </div>  
+        <!-- end content -->  
+        <div class="clear" style="height:10px"></div> 
+      </div>  
+      <!-- end container --> 
+    </div>  
+<?php include "footer.php"; ?>
+  </body>
+</html>
+<?php unset($_SESSION['result']);?>
