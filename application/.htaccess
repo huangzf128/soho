@@ -1,0 +1,52 @@
+RewriteEngine On
+RewriteBase /
+
+#RewriteCond %{REQUEST_URI} !(^/spconv.php$)
+
+# Set enviroment value by user-agent
+SetEnvIf User-Agent "iPhone" UAUA=sp
+SetEnvIf User-Agent "iPod" UAUA=sp
+SetEnvIf User-Agent "Android" UAUA=sp
+
+
+#RewriteCond %{ENV:UAUA} ^sp$
+#RewriteCond %{REQUEST_URI} !(^/spconv.php$)
+#RewriteRule ^(.*)\.php$ /spconv.php?p=$1.php [L]
+
+RewriteCond %{ENV:UAUA} ^sp$
+RewriteRule ^history/archive/(.*)$ /spconv.php?p=history/archive/$1 [L]
+
+RewriteCond %{ENV:UAUA} ^sp$
+RewriteRule ^history/(.*)$ /spconv.php?p=history/$1 [L]
+
+RewriteCond %{ENV:UAUA} ^sp$
+RewriteRule ^mail/(.*)$ /spconv.php?p=mail/$1 [L]
+
+RewriteCond %{ENV:UAUA} ^sp$
+RewriteRule ^what/(.*)$ /spconv.php?p=what/$1 [L]
+
+RewriteCond %{ENV:UAUA} ^sp$
+RewriteRule ^prof/(.*)$ /spconv.php?p=prof/$1 [L]
+
+RewriteCond %{ENV:UAUA} ^sp$
+RewriteRule ^link/(.*)$ /spconv.php?p=link/$1 [L]
+
+RewriteCond %{REQUEST_URI} (^/s_library/)
+RewriteRule ^s_library/(.*)$ /_library/$1 [L]
+
+RewriteCond %{REQUEST_URI} (^/s_css/)
+RewriteRule ^s_css/(.*)$ /_css/$1 [L]
+
+
+RewriteCond %{REQUEST_URI} !^/history.+$
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+
+RewriteCond %{REQUEST_URI}::$1 ^(/.+)(.+)::\2$
+RewriteRule ^(.*)$ - [E=BASE:%1]
+
+RewriteRule ^(.*)$ %{ENV:BASE}index.php [NC,L]
+
+

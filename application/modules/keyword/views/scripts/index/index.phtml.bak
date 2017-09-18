@@ -1,0 +1,42 @@
+<p id="readtex">『グーグルサジェスト キーワード一括ＤＬツール』は、Googleのサジェスト機能で表示されるキーワード候補を１回の操作で一度に表示させ、ｃｓｖでまとめてダウンロードできるツールです。<br>
+検索数が多い最新のキーワード調査や、ホームページのコンテンツ作成時のヒントなどにご利用ください。<br>
+<b><font color="#ff0000">【注意】</font></b><font color="#7f7f7f">アクセス数が急増すると、システムが正常に動かない（検索結果が０件になる）現象が起きることがございます。<br>申し訳ございませんが、続けて検索をされる場合は１分以上の間を空けていただけますようお願いいたします。<br>
+なお、<a href="history/" target="_blank">検索履歴</a>で０件が続いている場合は、数時間置いてから再度検索をしていただけましたら幸いです。</font><br>
+</p>
+<div id="form" class="clearfix"><br>
+<div id="f_txt">キーワード</div>
+
+<div id="f01">
+
+<form id="keywordFrm" name="form" method="post" action="<?php echo $this->baseUrl(); ?>result">
+<input id="registflg" type="hidden" name="registflg" value="1">
+<label>
+<input id="keyword" type="text" name="keyword" class="madow" value="<?php echo $this->layout()->keyword; ?>">
+</label>
+<input id="but" name="　　検　索　　" type="button" value="　　検　索　　" class="madoww">
+<div id="bloading"></div>
+</form>
+</div>
+
+</div><div class="clear"></div>
+
+<script>
+
+var cook;
+var cStart, cEnd;
+var cnt;
+
+//cookieが使えるか確認
+if (navigator.cookieEnabled)
+{
+  cook = document.cookie;
+  cStart = cook.indexOf("20170825", 0);
+
+  if (cStart == -1)
+  {
+    document.cookie="20170825";
+    window.location.reload(false);
+  }
+}
+
+</script>

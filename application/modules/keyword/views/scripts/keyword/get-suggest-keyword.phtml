@@ -1,0 +1,101 @@
+<p id="readtex">『グーグルサジェスト キーワード一括ＤＬツール』は、Googleのサジェスト機能で表示されるキーワード候補を１回の操作で一度に表示させ、ｃｓｖでまとめてダウンロードできるツールです。<br>
+検索数が多い最新のキーワード調査や、ホームページのコンテンツ作成時のヒントなどにご利用ください。</p>
+<div id="form" class="clearfix"><br>
+<div id="f_txt">キーワード</div>
+
+<div id="f01">
+<?php
+$pgurl = @$_SERVER["REQUEST_URI"];
+$pathname = explode("?",$pgurl);
+$pathname = explode("/",$pathname[0]);
+$pathname = $pathname[1];
+$debug = strpos($pgurl,"debug=1") . "";
+
+$ua = $_SERVER['HTTP_USER_AGENT'];
+if ((strpos($ua, 'Android') !== false) && (strpos($ua, 'Mobile') !== false) || (strpos($ua, 'iPhone') !== false) || (strpos($ua, 'Windows Phone') !== false)) {
+	$debug = 1;
+}
+
+$spmode = false;
+if ( $debug != "" ) {
+	$spmode = true;
+} ?>
+
+
+
+<form id="keywordFrm" name="form" method="post" action="<?php echo $this->baseUrl(); ?>result">
+<input id="registflg" type="hidden" name="registflg" value="1">
+<label>
+<input id="keyword" type="text" name="keyword" class="madow" value="<?php echo $this->layout()->keyword; ?>">
+</label>
+<input id="but" name="　　検　索　　" type="button" value="　　検　索　　" class="madoww">
+<div id="bloading"></div>
+</form>
+</div>
+
+</div><div class="clear"></div>
+
+<?php
+if ( $spmode ) {
+	/* SPのみ広告差し込み */
+	if ( $pathname == "" ) {
+	} else if ( $pathname == "result"){
+		include '/home/ad8-ssl/www/gskw/sp/adscript/result_ad_a.txt';
+	}
+}
+?>
+
+
+
+<div id="list">
+
+  <p>検索結果：<?php echo $this->layout()->rstCnt; ?> 件のキーワード候補が見つかりました。<br />
+<font color="ff0000">★</font><a href="http://www.yakw.net/" target="_blank">「ヤフーサジェスト キーワード一括ＤＬツール」もあわせてご利用ください。</a></p>
+
+  <?php echo $this->indextab; ?> 
+  
+※上記の青文字をクリックすると、該当のキーワードのブロックにジャンプします。<br/>  
+※＋マークのあるキーワードをクリックすると、さらにサジェスト候補が表示されます。
+<br/><br/>
+
+<p><font color="#ED1F27">[PR]</font> <a href="http://www.ad8.co.jp/sks/" onmouseover="color='#0000FF'" onmouseout="color='#111111'" target="_blank">サイト売買なら「サイト買取サービス」で。査定後にすぐに値段を送ります。</a></p>
+<br>
+
+<?php
+if ( $spmode ) {
+	/* SPのみ広告差し込み */
+	if ( $pathname == "" ) {
+	} else if ( $pathname == "result"){
+		include '/home/ad8-ssl/www/gskw/sp/adscript/result_ad_b.txt';
+	}
+}
+?>
+
+
+<form action="<?php echo $this->baseUrl(); ?>keyword/keyword/get-Csv-File" method="post" id="csvFrm">
+    <input type="hidden" id="csvdata" name="csvdata" />
+    <div class="csv_div">
+    <input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
+    <input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww3 csvprime" >
+    </div>
+    
+</form><br/>
+<p>
+<b>キーワード候補一覧</b> （キーワード：<?php echo $this->layout()->keyword; ?>）<br>
+
+<br/><br/>
+
+<div id="jQ-menu">
+    <?php echo $this->sk;?>
+</div>
+
+
+</p>
+
+<p></p>
+<div class="csv_div">
+<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
+<input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww3 csvprime" >
+</div>
+</div>
+
