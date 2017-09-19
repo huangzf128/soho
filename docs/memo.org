@@ -1,0 +1,11 @@
+* gskw　search result page
+1. 検索後、detaild.phtml + get-suggest-keyword.phtmlを元に、ファイルを作成する。
+2. しかし、layout.phtml + get-suggest-keyword.phtmlを元に、結果頁を作成する。
+3. 履歴頁は、そのファイルをそのまま表示している。つまり、detaild.phtml。
+
+
+* function
+search: http://gskw:8888
+delete: http://gskw:8888/delete
+history: http://gskw:8888/history
+
