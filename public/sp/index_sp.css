@@ -1,0 +1,71 @@
+﻿html{font-size: 31.25%; !important}
+html,body{margin:0px;padding:0px; }
+body *{font-size: 2rem !important; font-family: 'Lucida Grande','segoe UI','ヒラギノ角ゴ ProN W3','Hiragino Kaku Gothic ProN','メイリオ','Meiryo',sans-serif; }
+
+.taC{ text-align: center !important; }
+
+#wrapper{
+-webkit-box-shadow: none !important;
+}
+#header{
+	margin: 0px !important;
+}
+#readtex, #readtex *,
+#list, #list *{
+	font-size: 10px !important;
+	line-height: 15px !important;
+}
+#form #f01 {
+	padding-left: 0px !important;
+	text-align: center;
+}
+
+#form{
+	background: none !important;
+	margin: 0px !important;
+}
+
+#f_txt{
+	height: 40px !important;
+	background: #3366ff !important;
+	padding: 0px !important;
+	line-height: 40px !important;
+}
+
+#form_input label{
+	line-height: 40px;
+}
+#form_input{
+  background: #cceeff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+#but{
+	margin: 0px !important;
+	margin-top: 1rem;
+}
+
+#indextab{
+	margin-left: -2px;
+}
+#list td{
+	padding: 0px 3px !important;
+}
+#list td, #list *{
+	font-size: 10px !important;
+}
+
+
+#content {
+  margin: 5px !important;
+}
+
+#list{
+	margin 0px !important;
+	margin-top: 10px !important;
+	padding: 5px !important;
+}
+
+#csvFrm{
+	margin-top: 1rem;
+}

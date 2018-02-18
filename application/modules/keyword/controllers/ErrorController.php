@@ -2,7 +2,15 @@
 
 class Keyword_ErrorController extends Zend_Controller_Action
 {
-
+    public function init()
+    {
+        $zend_session = new Zend_Session_Namespace("auth");
+        if (isset($zend_session->userid)) {
+            $this->_helper->layout->assign('usertype', $zend_session->type);
+            $this->_helper->layout->assign('username', $zend_session->username);
+        }
+    }
+    
     public function errorAction()
     {
         $errors = $this->_getParam('error_handler');

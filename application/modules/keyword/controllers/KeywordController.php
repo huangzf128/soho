@@ -6,7 +6,17 @@ class Keyword_KeywordController extends Zend_Controller_Action
 	private $accessTimeLimit = 60;
 	private $accessCountLimit = 4;
 	
-    public function init(){ }
+    public function init()
+    { 
+        $zend_session = new Zend_Session_Namespace("auth");
+        if (isset($zend_session->userid)) {
+            $this->_helper->layout->assign('usertype', $zend_session->type);
+            $this->_helper->layout->assign('username', $zend_session->username);
+        }
+        
+        $model = new Keyword_Model_SuggestKeyword(null);
+        $this->_helper->layout->assign('isValidIp', $model->isValidIp());  // IPユーザー
+    }
 
     public function indexAction() { }
     
@@ -27,7 +37,6 @@ class Keyword_KeywordController extends Zend_Controller_Action
         	$this->_helper->layout->setLayout('layout');
         	return ;
         }
-        
 
 		// keyword check, block check
 		$checkResult = $model->checkKeyword();
@@ -53,41 +62,32 @@ class Keyword_KeywordController extends Zend_Controller_Action
 	        
         	return;
 		}
-
 		
 		// 検索
 		$model->getSuggestKeyword();
                         
-        $registFlg = $this->getRequest()->registflg;
+        $this->_helper->layout->setLayout('historyd');
+        $layout = $this->_helper->layout->getLayoutInstance();
         
-        $this->_helper->layout->assign('keyword', $keyword);
-        $this->_helper->layout->assign('rstCnt', $model->getRstCnt());
-        $this->_helper->layout->assign('isValidIp', $model->isValidIp());
-        $this->view->sk = $model->getStrSuggestKeywords();
-        $this->view->indextab = $model->getIndexTab();
-
+        $layout->assign('keyword', $keyword);
+        $layout->assign('rstCnt', $model->getRstCnt());
+        $this->view->sk = $model->getStrSuggestKeywords();  // 検索結果
+        $this->view->indextab = $model->getIndexTab();      // 索引
+        
+        $registFlg = $this->getRequest()->registflg;
         //検索情報をDB登録
         if(isset($registFlg) && $registFlg == 1){
             
         	$model->setRegistdt(date('Y-m-d H:i:s'));
-        	$model->registSearchHistoryResult();
         	
-        	$helper = $this->_helper->getHelper('Layout');
-        	$layout = $helper->getLayoutInstance();
+        	$this->view->historyid = $model->registSearchHistoryResult();
         	
-        	$this->_helper->layout->setLayout('historyd');
-            $layout = $this->_helper->layout->getLayoutInstance();        
-            $layout->assign('content', $this->view->render("keyword/get-suggest-keyword.phtml"));
-            $layout->assign('keyword', $keyword);
-            $layout->assign('date', $model->getRegistdt());
-            $layout->assign('rstCnt', $model->getRstCnt());
-            
-            $html = $layout->render(); 
-            $model->saveResult($html);
+            //$layout->assign('content', $this->view->render("keyword/get-suggest-keyword.phtml"));
+            //$html = $layout->render(); 
+            //$model->saveResult($html);
         }
               
-        $this->_helper->layout->setLayout('layout');
-        
+        //$this->_helper->layout->setLayout('layout');
     }
     
     
@@ -121,7 +121,20 @@ class Keyword_KeywordController extends Zend_Controller_Action
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="keyword.csv"');
         echo mb_convert_encoding ( $csvdata, "sjis", "utf-8");
-    } 
+    }
+    
+    public function getCsvFileOrderAction() 
+    {
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        
+        // 予約に入れる
+        $historyid = $this->getRequest()->historyid;
+        $model = new Keyword_Model_SuggestKeyword();
+        $model->csvOrder($historyid, $userid);
+        
+        echo "予約できました。";
+    }
     
     
     /**
@@ -134,7 +147,6 @@ class Keyword_KeywordController extends Zend_Controller_Action
         $currentNo = isset($this->getRequest()->currentNo) ? $this->getRequest()->currentNo : 1;        
         $model = new Keyword_Model_SuggestKeyword(null);
         $result = $model->getSearchHistoryList($currentNo);
-//      self::errOutput("error", $e->getMessage());
         
         if (isset($result) && count($result) > 0){
             $pageNo = $model->getSearchHistoryListPageNo($currentNo);
@@ -153,53 +165,43 @@ class Keyword_KeywordController extends Zend_Controller_Action
     
     
     /**
-     * キーワードの検索履歴を取得する(DB)
-     */
-    public function getSearchHistoryDetailAction()
-    {
-        $this->_helper->layout->setLayout('historyd');
-        
-        $id = $this->getRequest()->id;
-        
-        if(isset($id)) {
-        
-        	$model = new Keyword_Model_SuggestKeyword(null);
-        	$result = $model->getSearchHistoryDetail($id);
-    
-        	$this->_helper->layout->assign('keyword', $result['kword']);
-        	$this->_helper->layout->assign('date', $result['registdt']);
-        	
-        	$this->_helper->layout->assign('rstCnt', $result['rstcnt']);
-        	$this->view->sk = $result['result'];
-        	$this->view->indextab = $result['indextab'];
-        }
-        
-        $this->render();
-    }
-
-    
-    /**
      * キーワードの検索履歴を取得する(物理ファイル)
      */
     public function getSearchHistoryDetailFileAction()
     {
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender(true);
 
-        $fileName = $this->getRequest()->fileName;
+        $fileName_id = $this->getRequest()->fileName_id;
         $model = new Keyword_Model_SuggestKeyword(null);
         
+        $fileName = substr($fileName_id, 0, strrpos($fileName_id, '_'));
+        $id = substr($fileName_id, strrpos($fileName_id, '_') + 1);
+        
         $file = $model->getResultFile($fileName);
+        
         if($file === false) {
-        	//throw new Zend_Controller_Action_Exception('This page does not exist', 404);
-        	
-        	$helper = $this->_helper->getHelper('Layout');
-        	$layout = $helper->getLayoutInstance();
-        	 
-        	$layout->assign('content', $this->view->render("error/error.phtml"));
-        	$errHtml = $layout->render();
-        	echo $errHtml;
+            
+            $result = false;
+            
+            if(isset($id)) {
+                $result = $this->getSearchHistoryDetailAction($id);
+                $this->view->historyid = $id;
+            }
+            
+            if (!$result) {
+                // データ存在しない
+                $helper = $this->_helper->getHelper('Layout');
+                $layout = $helper->getLayoutInstance();
+                
+                $layout->assign('content', $this->view->render("error/error.phtml"));
+                
+                //$errHtml = $layout->render();
+                //echo $errHtml;
+            }
+            
         } else {
+
+            $this->_helper->layout->disableLayout();
+            $this->_helper->viewRenderer->setNoRender(true);
             
             $script = "";
             if($model->isValidIp()) {
@@ -207,7 +209,34 @@ class Keyword_KeywordController extends Zend_Controller_Action
             }            
         	echo $file.$script;
         }        
-    }    
+    }
+    
+    /**
+     * キーワードの検索履歴を取得する(DB)
+     */
+    private function getSearchHistoryDetailAction($id)
+    {
+        //$id = $this->getRequest()->id;
+    
+        $model = new Keyword_Model_SuggestKeyword(null);
+        $result = $model->getSearchHistoryDetail($id);
+
+        if ($result) {
+            
+            $this->_helper->layout->setLayout('historyd');
+            $layout = $this->_helper->layout->getLayoutInstance();
+            
+            $layout->assign('keyword', $result['kword']);
+            $layout->assign('rstCnt', $result['rstcnt']);
+            $this->view->sk = $result['sk'];
+            $this->view->indextab = $result['indextab'];
+            
+            // change phtml name
+            $this->_helper->viewRenderer->setRender('get-suggest-keyword');
+            return true;
+        }
+        return false;
+    }
     
     static function errOutput($errSql_file, $sql){
     
@@ -236,15 +265,14 @@ class Keyword_KeywordController extends Zend_Controller_Action
     	
     	$rst = false;
     	
-	try{
-		
-    	$namespace = new Zend_Session_Namespace();    	
-    	$current = strtotime(date("YmdHis")); 
-
-	 } catch (Exception $e) {
-			self::errOutput("error.log", $e->getMessage());
-     }
-    	
+    	try{
+    		
+        	$namespace = new Zend_Session_Namespace();    	
+        	$current = strtotime(date("YmdHis")); 
+    
+    	 } catch (Exception $e) {
+    			self::errOutput("error.log", $e->getMessage());
+         }
 
     	if(isset($namespace->lastAccess)){    		
 
@@ -266,7 +294,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
     		$rst = true;
     	}
     	
-    	Zend_Session::writeClose();
+    	//Zend_Session::writeClose();
     	return $rst;
     }
 }

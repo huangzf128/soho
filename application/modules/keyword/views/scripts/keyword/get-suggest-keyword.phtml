@@ -45,17 +45,34 @@ if ( $spmode ) {
 }
 ?>
 
+<!-- ---------------------------バナー  START  ---------------------------------- -->
 
+<table class="vici" align="center">
+<tr><th colspan="2">スポンサードリンク</th></tr>
+<tr>
+<td>
+<!--  ad tags Size: 300x250 ZoneId:1033152-->
+<script type="text/javascript" src="https://107249.gsspcln.jp/t/033/152/a1033152.js"></script>
+</td>
+<td>
+<!-- admax -->
+<script src="https://adm.shinobi.jp/s/cf36cfb1b1b9c1df3645645b2e6f5737"></script>
+<!-- admax -->
+</td>
+</tr>
+</table>
+
+<!-- ---------------------------バナー   END  ---------------------------------- -->
 
 <div id="list">
 
   <p>検索結果：<?php echo $this->layout()->rstCnt; ?> 件のキーワード候補が見つかりました。<br />
-<font color="ff0000">★</font><a href="http://www.yakw.net/" target="_blank">「ヤフーサジェスト キーワード一括ＤＬツール」もあわせてご利用ください。</a></p>
+<font color="ff0000">★</font><a href="https://www.yakw.net/" target="_blank">「ヤフーサジェスト キーワード一括ＤＬツール」もあわせてご利用ください。</a></p>
 
   <?php echo $this->indextab; ?> 
   
 ※上記の青文字をクリックすると、該当のキーワードのブロックにジャンプします。<br/>  
-※＋マークのあるキーワードをクリックすると、さらにサジェスト候補が表示されます。
+※<img src="/_img/add.png" alt="＋" style="vertical-align:top">マークのあるキーワードをクリックすると、さらにサジェスト候補が表示されます。
 <br/><br/>
 
 <p><font color="#ED1F27">[PR]</font> <a href="http://www.ad8.co.jp/sks/" onmouseover="color='#0000FF'" onmouseout="color='#111111'" target="_blank">サイト売買なら「サイト買取サービス」で。査定後にすぐに値段を送ります。</a></p>
@@ -72,13 +89,23 @@ if ( $spmode ) {
 ?>
 
 
-<form action="<?php echo $this->baseUrl(); ?>keyword/keyword/get-Csv-File" method="post" id="csvFrm">
+<form action="/keyword/keyword/get-Csv-File" method="post" id="csvFrm">
     <input type="hidden" id="csvdata" name="csvdata" />
-    <div class="csv_div">
-    <input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
-    <input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww3 csvprime" >
-    </div>
+    <input type="hidden" id="historyid" name="historyid" value="<?php echo $this->historyid;?>" />
     
+    <div class="csv_div">
+    
+<?php if ($this->layout()->isValidIp) { ?>
+      	<input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww4 csvprime" style="background-image: url(/_img/bt_csv_vip.jpg);">
+<?php } else { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
+<?php } 
+      if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得(予約)　" class="madoww4 csvorder" style="color:white;background-image: url(/_img/bt_csv_order.jpg);">
+<?php } ?>
+
+    <p style="margin-top:10px;"><img src="/_img/add.png" alt="＋" style="vertical-align:top"><a href="/csvall.pdf" target="_blank">の下層ワードのcsv取得方法</a></p>
+    </div>
 </form><br/>
 <p>
 <b>キーワード候補一覧</b> （キーワード：<?php echo $this->layout()->keyword; ?>）<br>
@@ -94,8 +121,16 @@ if ( $spmode ) {
 
 <p></p>
 <div class="csv_div">
-<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
-<input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww3 csvprime" >
+<?php if ($this->layout()->isValidIp) { ?>
+      	<input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww4 csvprime" style="background-image: url(/_img/bt_csv_vip.jpg);">
+<?php } else { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
+<?php } 
+      if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得(予約)　" class="madoww4 csvorder" style="color:white;background-image: url(/_img/bt_csv_order.jpg);">
+<?php } ?>
+
+<p style="margin-top:10px;"><img src="/_img/add.png" alt="＋" style="vertical-align:top"><a href="/csvall.pdf" target="_blank">の下層ワードのcsv取得方法</a></p>
 </div>
 </div>
 

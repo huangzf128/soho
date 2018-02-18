@@ -39,18 +39,17 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	 
     	$this->suggestAry = array("", " ",
     			"あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ",
-    			"さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と",
-    			"な",
-    			"に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
-    			"ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り", "る", "れ",
-    			"ろ", "わ",
-    			"が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ",
-    			"だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ",
-    			"ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
-    			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-    			"k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-    			"u", "v", "w", "x", "y", "z",
-    			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+//     			"さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と",
+//     			"な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
+//     			"ま", "み", "む", "め", "も", "や", "ゆ", "よ", 
+//     	        "ら", "り", "る", "れ",	"ろ", "わ",
+//     			"が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ",
+//     			"だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ",
+//     			"ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
+//     			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+//     			"k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+//     			"u", "v", "w", "x", "y", "z",
+//     			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
     	);    	 
     }
     
@@ -187,13 +186,17 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         	$srchRst['registdt'] = $this->registdt;
         	$srchRst['kword'] = $this->keyword;
         	$srchRst['rstcnt'] = $this->rstCnt;
+        	
+        	$srchRst['indextab'] = $this->indexTab;
+        	$srchRst['sk'] = $this->strSuggestKeywords;
+        	
         	$srchRst['clientip'] = $this->getClientIp(false); //略称形式
         	 
 //         	$srchRst['result'] = $this->strSuggestKeywords;
 //         	$srchRst['indextab'] = $this->indexTab;
         		
-        	$searchHistoryEntity->regist($srchRst);
-        		
+        	return $searchHistoryEntity->regist($srchRst);
+            
         } catch (Zend_Db_Adapter_Exception $e) {
         	throw $e;
         } catch (Zend_Exception $e) {
@@ -389,12 +392,26 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         }        
     }
 
+    public function csvOrder($historyid, $userid) {
+        try {
+            $searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
+        
+            $date["userid"] = $userid;
+            $where["id"] = $historyid;
+            
+            $searchHistoryEntity->updateHistory($data, $where);
+        } catch (Zend_Db_Adapter_Exception $e) {
+            throw $e;
+        } catch (Zend_Exception $e) {
+            throw $e;
+        }
+    }
+    
     /*------------------------------------------------------------------------
     *
     *  private
     *
     *------------------------------------------------------------------------*/
-    
     
     function getClientIp($type = true)
     {
@@ -622,7 +639,7 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     }
 
     private function getPageNoUrl($pageNo){
-    	return 'http://'.$_SERVER['HTTP_HOST'].'/history/index'.$pageNo.'.html';
+    	return '/history/index'.$pageNo.'.html';
     }
     
 //     // 2014/05/18 ADD

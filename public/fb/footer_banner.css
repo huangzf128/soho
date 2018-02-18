@@ -1,0 +1,102 @@
+.footer-banner {
+    background-color: rgba(51, 51, 51, 0.8);
+    bottom: 0;
+    color: #fff;
+    left: 0;
+    position: fixed;
+    width: 100%;
+    z-index: 10000;
+	text-align: center;
+	margin: 0;
+}
+.footer-banner img {
+ display: block;
+ margin-left: auto;
+ margin-right: auto;
+ margin-top: 10px;
+ margin-bottom: 10px;
+}
+@media only screen and (min-width: 970px){
+	.footer-banner img{
+		display: none;
+	}
+	.footer-banner .banner-4{
+		display: block;
+	}
+	.footer-banner-close {
+		width:18px;
+		height:18px;
+		background:url(../fb/close-x.png)no-repeat 0 0;
+		text-indent:-9000px;
+		cursor:pointer;
+		z-index:2;
+		display:block;
+		position:fixed;
+		left: 50%;
+		margin-left: 460px;
+		margin-top: 15px;
+	}
+}
+@media only screen and (min-width: 728px) and (max-width: 969px){
+	.footer-banner img{
+		display: none;
+	}
+	.footer-banner .banner-3{
+		display: block;
+	}
+	.footer-banner-close {
+		width:18px;
+		height:18px;
+		background:url(../fb/close-x.png)no-repeat 0 0;
+		text-indent:-9000px;
+		cursor:pointer;
+		z-index:2;
+		display:block;
+		position:fixed;
+		left: 50%;
+		margin-left: 335px;
+		margin-top: 15px;
+	}
+}
+@media only screen and (min-width: 468px) and (max-width: 727px){
+	.footer-banner img{
+		display: none;
+	}
+	.footer-banner .banner-2{
+		display: block;
+	}
+	.footer-banner-close {
+		width:18px;
+		height:18px;
+		background:url(../fb/close-x.png)no-repeat 0 0;
+		text-indent:-9000px;
+		cursor:pointer;
+		z-index:2;
+		display:block;
+		position:fixed;
+		left: 50%;
+		margin-left: 205px;
+		margin-top: 15px;
+	}
+}
+@media only screen and (max-width: 467px){
+	.footer-banner img{
+		display: none;
+	}
+	.footer-banner .banner-1{
+		display: block;
+	}
+	.footer-banner-close {
+		width:18px;
+		height:18px;
+		background:url(../fb/close-x.png)no-repeat 0 0;
+		text-indent:-9000px;
+		cursor:pointer;
+		z-index:2;
+		display:block;
+		position:fixed;
+		left: 50%;
+		margin-left: 135px;
+		margin-top: 15px;
+	}
+}

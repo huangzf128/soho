@@ -21,25 +21,12 @@ $(function() {
 
 });
 
-// トップページにバナーを表示しないので、$("#list").lengthでトップページかどうかを判断する
 var resultbarObj = $("#form");
-if(resultbarObj.length > 0 && $("#list").length > 0){
-	// result.html
-	document.write("<iframe id='resultbar' style='display:block;margin:0 auto;width:700px;height:360px;' " +
-	"scrolling='no' frameBorder='0' src='/banner/result.html?param=1'></iframe>");
-}
-
-var footbarObj = $("#wrapper");
-if(footbarObj.length > 0 && $("#list").length > 0){
-	// footer.html
-	document.write("<iframe id='footbar' style='display:block;margin:20px auto;width:750px;height:150px;' " +
-			"scrolling='no' frameBorder='0' src='/banner/footer.html?param=1'></iframe>");
-}
 
 if($("#list").length > 0){
 	// side.html
 	document.write("<iframe onload='setToDiv(this);' id='sidebar' style='display:none;margin:0 auto;width:730px;height:400px;' " +
-			"scrolling='no' frameBorder='0' src='/banner/side.html?param=1'></iframe>");
+			"scrolling='no' frameBorder='0' src='/banner/side.html?param=2'></iframe>");
 }
 
 function setToDiv(iframe){
@@ -57,12 +44,36 @@ function setToDiv(iframe){
 	}
 }
 
+//トップページにバナーを表示しないので、$("#list").lengthでトップページかどうかを判断する
+//var resultbarObj = $(".aiueobox-txt:eq(0)");
+if(resultbarObj.length > 0 && $("#list").length > 0){
+	// result.html
+	document.write("<iframe id='resultbar' style='display:block;margin:0 auto;width:700px;height:360px;' " +
+	"scrolling='no' frameBorder='0' src='/banner/result.html?param=1'></iframe>");
+}
+
+var footbarObj = $("#wrapper");
+if(footbarObj.length > 0 && $("#list").length > 0){
+	// footer.html
+	document.write("<iframe id='footbar' style='display:block;margin:20px auto;width:750px;height:150px;' " +
+			"scrolling='no' frameBorder='0' src='/banner/footer.html?param=1'></iframe>");
+}
+
+
+// 検索条件部バナー	
+if(resultbarObj.length > 0 && $("#list").length > 0){
+	$("#sidebar").insertAfter(resultbarObj);
+	//$("#resultbar").insertAfter(resultbarObj);		
+	
+} 
+
 $(function(){
 
 	// 検索条件部バナー	
 	if(resultbarObj.length > 0 && $("#list").length > 0){
-		$("#resultbar").insertAfter(resultbarObj);		
-		$("#sidebar").insertAfter(resultbarObj);
+		//$("#sidebar").insertAfter(resultbarObj);
+		//$("#resultbar").insertAfter(resultbarObj);		
+		
 	} 
 	
 	// フッターバナー

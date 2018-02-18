@@ -43,24 +43,23 @@ $router->addRoute('historyindex',
 				array('module' => 'keyword', 'controller'=>'keyword',
 						'action'=>'get-Search-History-List', 'currentNo' => 1)
 				));
-
 $router->addRoute('history',
 		new Zend_Controller_Router_Route('history/',
 				array('module' => 'keyword', 'controller'=>'keyword',
 						'action'=>'get-Search-History-List', 'currentNo' => 1)
 		));
-
 $router->addRoute('historyindexn',
 		new Zend_Controller_Router_Route_Regex('history/index(\d+)\.html',
 				array('module' => 'keyword', 'controller'=>'keyword', 
 				        'action'=>'get-Search-History-List'),
 		        array('currentNo' => 1)));
 
+
 $router->addRoute('historyDetailUrl',
 		new Zend_Controller_Router_Route_Regex('history/archive/(.+)',
 				array('module' => 'keyword', 'controller'=>'keyword', 
 				        'action'=>'get-Search-History-Detail-File'),
-		        array('fileName' => 1)));
+		        array('fileName_id' => 1)));
 
 
 // 2014-05-18 ADD

@@ -15,8 +15,8 @@ class Keyword_Model_Entities_SearchHistory extends Db_Abstract
 		$srchRst->kword = $info['kword'];
 		$srchRst->rstcnt = $info['rstcnt'];
 		$srchRst->clientip = $info['clientip'];
-		//$srchRst->result = $info['result'];
-		//$srchRst->indextab = $info['indextab'];		
+		$srchRst->indextab = $info['indextab'];
+		$srchRst->sk = $info['sk'];		
 		
 		try
 		{
@@ -83,6 +83,15 @@ class Keyword_Model_Entities_SearchHistory extends Db_Abstract
 	}
 	// 2014/05/18 ADD
 	
+	public function updateHistory($data, $where)
+	{
+		try{
+			$updCnt = $this->update($data, $where);
+		}catch(Exception $e){
+			return false;
+		}
+		return $updCnt;
+	}
 	
 	/**
 	 * ゲットレコード

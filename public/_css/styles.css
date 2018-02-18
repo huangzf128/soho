@@ -202,6 +202,16 @@ width: 860px;
     margin:0 auto;
     display: none;
 }
+.madoww4{
+    font-family: "メイリオ";
+    font-size: 18px;
+    color: #003399;
+    background-repeat: no-repeat;
+    height: 43px;
+    width: 148px;
+    border: none;
+    margin:0 auto;
+}
 .csv_div {
     text-align:center;
 }
@@ -424,6 +434,14 @@ footer p {
 	margin: 0 0 3px 0px;
 	padding-left: 18px;
 }
+#lefticon4 {
+    float: left;
+    margin: 0 0 3px 0px;
+    padding-left: 14px;
+}
+#lefticon4 a {
+	color:white;
+}
 #fb-root {
 	float: left;
 	margin: 0px;
@@ -566,6 +584,47 @@ table.vici{
 	border-bottom: 1px solid #0167CC;
 	border-right: 1px solid #0167CC;
 }
+
+
+/*ログイン画面*/
+p#loginpg {
+	padding: 15px 5px;
+	color: #333;
+	font-size: 15px;
+}
+.logint {
+	border: 1px solid #aaa;
+	border-collapse: collapse;
+	width: 410px;
+	margin: 15px auto 30px;
+	font-size: 14px;
+}
+.logint th {
+	border-bottom: 1px solid #aaa;
+	background: #fff4eb;
+	font-weight: normal;
+	color: #555;
+	text-align: left;
+	padding: 2px 7px;
+	width: 25%;
+}
+.logint td {
+	border-bottom: 1px solid #aaa;
+	padding: 0 2px;
+}
+.logint td input {
+	width: 97%;
+	margin-left: 4px;
+}
+.loginb {
+	text-align: center;
+	margin-bottom: 40px;
+}
+.loginb input {
+	padding: 2px 5px;
+}
+
+
 /*layout.phtml*/
 	.tool {
 		width: 790px;

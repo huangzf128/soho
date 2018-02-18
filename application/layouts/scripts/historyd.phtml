@@ -1,13 +1,37 @@
 <!DOCTYPE html>
 <html lang="ja">
-<!--/-->
+<!--///-->
 <head>
+
+<?php
+$pgurl = @$_SERVER["REQUEST_URI"];
+$pathname = explode("?",$pgurl);
+$pathname = explode("/",$pathname[0]);
+$pathname = $pathname[1];
+$debug = strpos($pgurl,"debug=1") . "";
+$spmode = false;
+
+$ua = $_SERVER['HTTP_USER_AGENT'];
+if ((strpos($ua, 'Android') !== false) && (strpos($ua, 'Mobile') !== false) || (strpos($ua, 'iPhone') !== false) || (strpos($ua, 'Windows Phone') !== false)) {
+	$debug = 1;
+}
+
+if ( $debug != "" ) {
+$spmode = true;
+?>
+	<meta name="viewport" content="width=320px,user-scalable=yes">
+	<script type="text/javascript" src="/sp/common_sp.js" charaset="UTF-8"></script>
+	<script type="text/javascript" src="/sp/index_sp.js" charaset="UTF-8"></script>
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<?php } ?>
+
+<script	src="<?php echo $this->baseUrl(); ?>_library/jquery-1.9.1.js" language="javascript"></script>
+
 <meta charset="utf-8" />
 <title>Googleサジェスト検索結果履歴│<?php echo $this->layout()->keyword; ?>│<?php echo $this->layout()->date; ?></title>
 <meta name="description" content="「グーグルサジェスト キーワード一括ダウンロードツール」を使用して検索した検索ワード（キーワード）の履歴を紹介しているページです。検索ワード：「<?php echo $this->layout()->keyword; ?>」、調査時刻（年月日時分秒）：「<?php echo $this->layout()->date; ?>」">
 <meta name="keywords" content="<?php echo $this->layout()->keyword; ?>,Googleサジェスト,検索,履歴,<?php echo $this->layout()->date; ?>">
-
-<link rel="stylesheet" href="<?php echo $this->baseUrl(); ?>_css/styles.css?t=<?php echo time(); ?>" type="text/css" />
+<link rel="stylesheet" href="/_css/styles.css?t=<?php echo time(); ?>" type="text/css" />
 <!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -82,7 +106,7 @@
 <div id="header" class="clearfix"><p>グーグルサジェストのキーワード候補をまとめてｃｓｖでダウンロードできるツール</p>
 <div id="fav">
 
-<div id="lefticon1"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.gskw.net/" data-text="グーグルサジェスト キーワード一括ＤＬツール">Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></div>
+<div id="lefticon1"><a href="https://twitter.com/share" class="twitter-share-button" <?php if ($spmode){ echo 'data-count="vertical"' ; } ?> data-url="http://www.gskw.net/" data-text="グーグルサジェスト キーワード一括ＤＬツール">Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></div>
 
 <div id="fb-root"></div><script>(function(d, s, id) {
 var js, fjs = d.getElementsByTagName(s)[0];
@@ -90,15 +114,49 @@ if (d.getElementById(id)) return;
 js = d.createElement(s); js.id = id;
 js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1";
 fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script><div class="fb-like" data-href="http://www.gskw.net/" data-send="false" data-layout="button_count" data-width="450" data-show-faces="true"></div>
+}(document, 'script', 'facebook-jssdk'));</script><div class="fb-like" data-href="https://www.gskw.net/" data-send="false" data-layout="<?php if ($spmode){ echo 'box' ; } else { echo 'button'; } ?>_count" data-width="450" data-show-faces="true"></div>
 
 <div id="lefticon2">　<a href="http://b.hatena.ne.jp/entry/http://www.gskw.net/" class="hatena-bookmark-button" data-hatena-bookmark-title="グーグルサジェスト キーワード一括ＤＬツール" data-hatena-bookmark-layout="simple-balloon" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></div>
 
-<div id="lefticon3"><script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script><g:plusone></g:plusone></div>
+<div id="lefticon3"><script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script><g:plusone<?php if ($spmode){ echo ' size="tall"' ; } ?>></g:plusone></div>
+
+<div id="lefticon4">
+<?php if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) {
+    echo "<a href='/keyword/index/logout'>ログアウト</a>";
+} else {
+    echo "<a href='/keyword/index/login'>ログイン</a>";
+ } ?>
+</div><!-- lefticon4 -->
+</div><!-- end fav -->
+
 </div>
-</div>
+
+<?php
+if ( $spmode ) {
+	/* SPのみ広告差し込み */
+	if ( $pathname == "" ) {
+	include '/home/ad8-ssl/www/gskw/sp/adscript/index_ad_1.txt';
+	} else if ( $pathname == "result"){
+	include '/home/ad8-ssl/www/gskw/sp/adscript/result_ad_1.txt';
+	}
+}
+
+?>
+
 <div id="wrapper">
-<header><a href="/" title="グーグルサジェスト キーワード一括ダウンロードツール"></a></header>
+<header>
+
+<div style="float:right;color:blue;margin-top:0px;">
+<?php if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) { 
+        $username = "こんにちは、<B>".$this->layout()->username."</B>　様　";
+        echo $username;
+} ?>
+</div>
+
+
+<a href="/" title="グーグルサジェスト キーワード一括ダウンロードツール"></a>
+
+</header>
 <h1><span class="txtclear">グーグルサジェスト キーワード一括ＤＬツールGoogle Suggest Keyword Package Download Tool</span></h1>
 <section id="main">
 <section id="content">
@@ -109,29 +167,19 @@ fjs.parentNode.insertBefore(js, fjs);
 </section>
 </section>
 
-<?php /*
-<p align="center">
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- グーグルサジェスト キーワード一括ＤＬツール_728x15_ue -->
-<ins class="adsbygoogle"
-     style="display:inline-block;width:728px;height:15px"
-     data-ad-client="ca-pub-0338168428759491"
-     data-ad-slot="8881919553"></ins>
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-<br><br>
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- グーグルサジェスト キーワード一括ＤＬツール_728x90 -->
-<ins class="adsbygoogle"
-     style="display:inline-block;width:728px;height:90px"
-     data-ad-client="ca-pub-0338168428759491"
-     data-ad-slot="9866019156"></ins>
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-</p>
-*/ ?>
+<?php
+if ( $spmode ) {
+	/* SPのみ広告差し込み */
+	if ( $pathname == "" ) {
+	include '/home/ad8-ssl/www/gskw/sp/adscript/index_ad_2.txt';
+	} else if ( $pathname == "result"){
+	include '/home/ad8-ssl/www/gskw/sp/adscript/result_ad_2.txt';
+	}
+}
+
+?>
+
+
 
 <div class="tool">
 	<table>
@@ -178,13 +226,13 @@ fjs.parentNode.insertBefore(js, fjs);
 <footer>
 <section id="footer-area">
 <section id="footer-outer-block">
-<aside class="footer-segment01"><a href="http://www.gskw.net/what/"><span style="color:#003366;">Googleサジェストとは</span></a></aside>
-<aside class="footer-segment02"><a href="http://www.gskw.net/history/"><span style="color:#003366;">検索履歴</span></a></aside>
-<aside class="footer-segment03"><a href="http://www.gskw.net/set/" ><span style="color:#003366;">当ツールをサイトに設置</span></a></aside>
-<aside class="footer-segment04"><a href="http://www.gskw.net/link/"><span style="color:#003366;">リンクについて</span></a></aside>
-<aside class="footer-segment05"><a href="http://www.gskw.net/prof/"><span style="color:#003366;">運営者情報</span></a></aside>
-<aside class="footer-segment06"><a href="http://www.gskw.net/mail/" target="_blank"><span style="color:#003366;">お問い合わせ</span></a></aside>
-<aside class="footer-segment07"><a href="http://www.gskw.net/"><span style="color:#003366;">TOP</span></a></aside>
+<aside class="footer-segment01"><a href="/what/"><span style="color:#003366;">Googleサジェストとは</span></a></aside>
+<aside class="footer-segment02"><a href="/history/"><span style="color:#003366;">検索履歴</span></a></aside>
+<aside class="footer-segment03"><a href="/set/" ><span style="color:#003366;">当ツールをサイトに設置</span></a></aside>
+<aside class="footer-segment04"><a href="/link/"><span style="color:#003366;">リンクについて</span></a></aside>
+<aside class="footer-segment05"><a href="/prof/"><span style="color:#003366;">運営者情報</span></a></aside>
+<aside class="footer-segment06"><a href="/mail/" target="_blank"><span style="color:#003366;">お問い合わせ</span></a></aside>
+<aside class="footer-segment07"><a href="/"><span style="color:#003366;">TOP</span></a></aside>
 </section>
 Copyright (C) 1st-MEDIA,inc. All Rights Reserved.
 </section>
@@ -192,35 +240,68 @@ Copyright (C) 1st-MEDIA,inc. All Rights Reserved.
 
 </div>
 <br>
-
-<?php /*
 <p align="center">
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- グーグルサジェスト キーワード一括ＤＬツール_728x90 -->
-<ins class="adsbygoogle"
-     style="display:inline-block;width:728px;height:90px"
-     data-ad-client="ca-pub-0338168428759491"
-     data-ad-slot="9866019156"></ins>
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-<br><br>
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- グーグルサジェスト キーワード一括ＤＬツール_728x15_sita -->
-<ins class="adsbygoogle"
-     style="display:inline-block;width:728px;height:15px"
-     data-ad-client="ca-pub-0338168428759491"
-     data-ad-slot="1358652750"></ins>
-<script>
-(adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-<br>
-</p>
-*/ ?>
 
+<?php if ( $spmode == false ) {
+/* PC表示の場合のみ表示 */
+?>
+<!-- admax -->
+<script src="http://adm.shinobi.jp/s/c30c21949fb127b9a960a72a395e48d9"></script>
+<!-- admax --><br />
+<script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://az.ctwpromotion.net/pandora2/infotop.html" onClick="return clickCount(130546, 63824);">一番売れているキーワードツール！ライバルが稼いでいるキーワードと商品一覧を合法的に「のぞき見」できます。</a>
+	<br><br>
+<?php } else {
 
-<script	src="<?php echo $this->baseUrl(); ?>_library/jquery-1.9.1.js" language="javascript"></script>
-<script	src="<?php echo $this->baseUrl(); ?>_library/jMenu.js" language="javascript"></script>
+/* SP表示の場合のみ広告タグ読み込み */
+echo '<!--' . $pathname . '-->';
+if ( $pathname == "" ) {
+include '/home/ad8-ssl/www/gskw/sp/adscript/index_ad_3.txt';
+} else if ( $pathname == "result"){
+include '/home/ad8-ssl/www/gskw/sp/adscript/result_ad_3.txt';
+}
+
+} ?>
+
+<div id="sidereadtex">
+<!-- ---------------------------banner START  ---------------------------------- -->
+
+<!-- geniee サイド追従枠 ここから left banner -->
+<div id="g_floating_area1" style="display:none;top:0px;z-index:10000000000;right:50%;">
+
+<!--  ad tags Size: 160x600 ZoneId:1033155-->
+<script type="text/javascript" src="https://js.gsspcln.jp/t/033/155/a1033155.js"></script>
+
+<!--  ad tags Size: 160x600 ZoneId:1084264-->
+<!--<script type="text/javascript" src="//js.medi-8.net/t/084/264/a1084264.js"></script>-->
+</div>
+
+<!-- right banner -->
+<div id="g_floating_area2" style="display:none;top:0px;z-index:10000000000;left:50%;">
+<!--  ad tags Size: 160x600 ZoneId:1033156-->
+<!--<script type="text/javascript" src="//107249.gsspcln.jp/t/033/156/a1033156.js"></script>-->
+
+<script type="text/javascript" language="JavaScript">
+   var ydn_id = '38807_132590';
+</script>
+<script type="text/javascript" language="JavaScript" src="//use-way-ad.com/usewaypc.js"></script>
+
+</div>
+<script type="text/javascript">                                                     
+window.__gnsj = {
+	    "contents_width": 900, //サイトのcontentsの幅に変換,
+	    "extra_margin"  : 3,    //コンテンツから離したい幅に変換                        
+	    "top_pos"       : 40,     //ページtopからの位置
+	    "footer_pos"    : 0                               
+};
+</script>
+<script type="text/javascript" src="//js.gsspcln.jp/sdk/l/geniee_sjv5.js"></script>
+<!-- geniee サイド追従枠 ここまで -->
+
+<!-- ---------------------------banner  END  ---------------------------------- -->
+</div>
+
+<script	src="<?php echo $this->baseUrl(); ?>_library/jMenu_new.js?date=20180211" language="javascript"></script>
 <script	src="<?php echo $this->baseUrl(); ?>_library/spin.min.js" language="javascript"></script>
 <script>
 var clicked = "";
@@ -256,6 +337,7 @@ $(function(){
 	$("#keywordFrm").submit(onFrmSubmit);
 	
 	$("#jQ-menu").on("click", ".sugkey", function(){
+
 	    var keyword = $(this).text();
 	    var child = $(this).next();
 	     
@@ -296,6 +378,19 @@ $(function(){
 		$("#csvFrm").submit();
 	});	
 
+	$(".csvorder").click(function(){
+		
+		$.ajax({
+			type: "post",
+			url: "/keyword/keyword/get-Csv-File-Order",
+			async: true,
+			data:{"historyid" : $("#historyid").val()},
+			success:function(data){
+				alert(data);
+			}
+		}).responseText;		
+	});	
+	
 	function makeCsv(path, $ul) {
 		csv = '';
 		$ul.children("li").each(function(){
@@ -315,18 +410,6 @@ $(function(){
 		return csv;
 	}
 
-	$("#pageno").click(function(event){		
-		if ($(event.target).is('a')){
-			$("#currentNo").val($(event.target).find("span").text());
-			var no = $(event.target).find("span").text();
-			if (no == 1) no = "";
-			var action = $("#pfrm").attr('action') + no + ".html";
-			$("#pfrm").attr('action', action); 
-			$("#pfrm").submit();
-		}	
-	});
-	
-	
 });
 
 function getSuggestKeywordAjax(keyword){
@@ -350,10 +433,10 @@ function getSuggestKeywordAjax(keyword){
 </script>
 
 <!--SP_下部固定（高さ50px）-->
-<script type="text/javascript" language="JavaScript">
+<script type="text/javascript">
     var ydn_id = '43068_132594';
 </script>
-<script type="text/javascript" language="JavaScript" src="//use-way-ad.com/usewayfloat.js"></script>
+<script type="text/javascript" src="//use-way-ad.com/usewayfloat.js"></script>
 <!--/SP_下部固定-->
 
 </body>
