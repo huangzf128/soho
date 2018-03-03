@@ -5,11 +5,15 @@ class Keyword_KeywordController extends Zend_Controller_Action
 {
 	private $accessTimeLimit = 60;
 	private $accessCountLimit = 4;
+	private $userid = null;
+	public $csvExpandLevelMax = 2;
 	
     public function init()
     { 
         $zend_session = new Zend_Session_Namespace("auth");
         if (isset($zend_session->userid)) {
+            $this->_helper->layout->assign('userid', $zend_session->userid);
+            $this->userid = $zend_session->userid;
             $this->_helper->layout->assign('usertype', $zend_session->type);
             $this->_helper->layout->assign('username', $zend_session->username);
         }
@@ -79,15 +83,8 @@ class Keyword_KeywordController extends Zend_Controller_Action
         if(isset($registFlg) && $registFlg == 1){
             
         	$model->setRegistdt(date('Y-m-d H:i:s'));
-        	
         	$this->view->historyid = $model->registSearchHistoryResult();
-        	
-            //$layout->assign('content', $this->view->render("keyword/get-suggest-keyword.phtml"));
-            //$html = $layout->render(); 
-            //$model->saveResult($html);
         }
-              
-        //$this->_helper->layout->setLayout('layout');
     }
     
     
@@ -130,12 +127,46 @@ class Keyword_KeywordController extends Zend_Controller_Action
         
         // 予約に入れる
         $historyid = $this->getRequest()->historyid;
-        $model = new Keyword_Model_SuggestKeyword();
-        $model->csvOrder($historyid, $userid);
+        $model = new Keyword_Model_SuggestKeyword(null);
+        $model->csvOrder($historyid, $this->userid);
+        
+        $csvModel = new Keyword_Model_Csv();
+        $csvModel->registCsvOrder($this->userid, $historyid);
+        
+        
+        // expand insert
+        
+        //$rst = $csvModel->registExpand($historyid);
+        
+        //$this->createExpandCsv($historyid);
         
         echo "予約できました。";
     }
     
+    
+    private function createExpandCsv($historyid) {
+        
+        $model = new Keyword_Model_SuggestKeyword(null);
+        $csvModel = new Keyword_Model_Csv();
+        
+        // check, is need 
+         
+        // get history
+        $expandRst = $csvModel->getExpandResult($historyid);
+        $expandKeywords = $expandRst["result"];
+        
+        // expand Search
+        for ($i = 0; $i < $this->csvExpandLevelMax; $i++) {
+            if (empty($expandRst["level". ($i + 1)])) {
+                $expandKeywords = $csvModel->expandLevel($expandKeywords);
+                $csvModel->updateExpandLevel($historyid, $expandKeywords, $i + 1);
+            } else {
+                $expandKeywords = $expandRst["level".($i + 1)];
+            }
+        }
+
+        return 0;
+    }
     
     /**
      * 検索履歴リストを取得する

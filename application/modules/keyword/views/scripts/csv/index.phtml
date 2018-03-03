@@ -1,0 +1,18 @@
+<table id="historytab" align="center">
+<tr>
+    <td width="50%">キーワード</d>
+    <td width="25%">予約日付</td>
+    <td width="25%"> </td>
+</tr>
+
+<?php 
+    foreach ($this->orders as $row) {
+    	echo   '<tr>'.
+    	       '<td>'.$row["historyid"].'</td>'.
+    	       '<td>'.$row["updatedt"].'</td>'.
+    	       '<td><a href="/keyword/csv/download?id='.$row["historyid"].'" >'.Download.'</a></td>'.
+    	       '</tr>';
+    };
+?>
+
+</table>

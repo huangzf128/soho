@@ -31,6 +31,16 @@ $spmode = true;
 <title>Googleサジェストから検索ワード候補を一括ダウンロード『グーグルサジェスト キーワード一括ＤＬツール』</title>
 <meta name="description" content="グーグルのサジェスト機能を使用して、検索ワード候補を一覧表で表示させて、簡単にcsvで一括ダウンロードできるツールが『グーグルサジェスト キーワード一括ＤＬツール』です。最新のキーワード調査やホームページのコンテンツ作成などにお役立てください。">
 <meta name="keywords" content="Googleサジェスト,キーワード,csv,一括,ダウンロード">
+<style type="text/css">
+#csv-download {
+    clear:both;float:right;
+    background-color: #2379fd; color:white;
+    display: inline-box;line-height:25px;
+    width: 90px;height:25px;
+    margin:24px 40px auto auto;
+    text-align:center;border-radius:4px;cursor:pointer;
+}
+</style>
 <link rel="stylesheet" href="/_css/styles.css?t=<?php echo time(); ?>" type="text/css" />
 <!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 <script>
@@ -71,7 +81,6 @@ fjs.parentNode.insertBefore(js, fjs);
 </div><!-- lefticon4 -->
 </div><!-- end fav -->
 
-
 </div>
 
 <?php
@@ -83,7 +92,6 @@ if ( $spmode ) {
 	include '/home/ad8-ssl/www/gskw/sp/adscript/result_ad_1.txt';
 	}
 }
-
 ?>
 
 <div id="wrapper">
@@ -95,6 +103,8 @@ if ( $spmode ) {
         echo $username;
 } ?>
 </div>
+
+<div id="csv-download" >CSV管理</div>
 
 <a href="/" title="グーグルサジェスト キーワード一括ダウンロードツール"></a>
 
@@ -119,10 +129,7 @@ if ( $spmode ) {
 	include '/home/ad8-ssl/www/gskw/sp/adscript/result_ad_2.txt';
 	}
 }
-
 ?>
-
-
 
 <div class="tool">
 	<table>
@@ -241,6 +248,10 @@ $(function(){
 	$("#but").click(function(){$("#keywordFrm").submit();});
 	$("#keywordFrm").submit(onFrmSubmit);
 
+	$("#csv-download").click(function(e){
+		window.location.href = "/csv";
+		e.stopPropagation();
+	});
 });
 
 

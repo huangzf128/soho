@@ -5,18 +5,14 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     private $registdt;
     private $suggestAry;
     
-    /* 検索結果 */
-    private $strSuggestKeywords;
-    /* 結果件数 */
-    private $rstCnt;
-    /* index テーブル */
-    private $indexTab;
-    /* index テーブルの列数 */
-    private $tdCnt;
-    
+    private $strSuggestKeywords;    /* 検索結果 */
+    private $rstCnt;                /* 結果件数 */
+    private $indexTab;              /* index テーブル */
+    private $tdCnt;                 /* index テーブルの列数 */
     private $pnum;
-    
     private $serverEncode;
+    
+    private $groupMaxRstCount;
     
     /**
      * init
@@ -30,6 +26,7 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	$this->tdCnt = 21;
     	$this->strSuggestKeywords = "";
     	$this->serverEncode = "EUC-JP";
+    	$this->groupMaxRstCount = 10;
 
     	/** 件楽履歴頁に一頁あたりのキーワード件数 */
     	$this->pnum = 100;
@@ -53,7 +50,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	);    	 
     }
     
-
     public function checkKeyword()
     {
     	if($this->keyword == "") {
@@ -108,25 +104,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
             }
         }
         return false;
-    }
-    
-    function get_client_ip() {
-        $ipaddress = '';
-        if (isset($_SERVER['HTTP_CLIENT_IP']))
-            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        else if(isset($_SERVER['HTTP_X_FORWARDED']))
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
-            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-        else if(isset($_SERVER['HTTP_FORWARDED']))
-            $ipaddress = $_SERVER['HTTP_FORWARDED'];
-        else if(isset($_SERVER['REMOTE_ADDR']))
-            $ipaddress = $_SERVER['REMOTE_ADDR'];
-        else
-            $ipaddress = 'UNKNOWN';
-        return $ipaddress;
     }
     
     /**
@@ -191,10 +168,7 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         	$srchRst['sk'] = $this->strSuggestKeywords;
         	
         	$srchRst['clientip'] = $this->getClientIp(false); //略称形式
-        	 
-//         	$srchRst['result'] = $this->strSuggestKeywords;
-//         	$srchRst['indextab'] = $this->indexTab;
-        		
+
         	return $searchHistoryEntity->regist($srchRst);
             
         } catch (Zend_Db_Adapter_Exception $e) {
@@ -396,8 +370,10 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         try {
             $searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
         
-            $date["userid"] = $userid;
-            $where["id"] = $historyid;
+            $data["userid"] = $userid;
+            $data["csvstatus"] = 1;
+            
+            $where["id = ?"] = $historyid;
             
             $searchHistoryEntity->updateHistory($data, $where);
         } catch (Zend_Db_Adapter_Exception $e) {
@@ -407,11 +383,13 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         }
     }
     
+
     /*------------------------------------------------------------------------
     *
     *  private
     *
     *------------------------------------------------------------------------*/
+
     
     function getClientIp($type = true)
     {
@@ -509,7 +487,7 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         }
         $this->strSuggestKeywords.= "</ul>";        
     }
-    
+
     
     /**
      * キーワードテーブルを作成する
@@ -543,6 +521,24 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	}
     }
     
+    private function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP']))
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED']))
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_FORWARDED']))
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        else if(isset($_SERVER['REMOTE_ADDR']))
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        else
+            $ipaddress = 'UNKNOWN';
+        return $ipaddress;
+    }
     
     /**
      * APIを呼んで、サジェストキーワードを取得する

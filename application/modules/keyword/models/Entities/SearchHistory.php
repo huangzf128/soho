@@ -16,7 +16,7 @@ class Keyword_Model_Entities_SearchHistory extends Db_Abstract
 		$srchRst->rstcnt = $info['rstcnt'];
 		$srchRst->clientip = $info['clientip'];
 		$srchRst->indextab = $info['indextab'];
-		$srchRst->sk = $info['sk'];		
+		$srchRst->sk = $info['sk'];	
 		
 		try
 		{
