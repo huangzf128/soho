@@ -62,6 +62,13 @@ $router->addRoute('historyDetailUrl',
 		        array('fileName_id' => 1)));
 
 
+// 2014-05-18 ADD
+$router->addRoute('history1',
+		new Zend_Controller_Router_Route('history1/',
+			array('module' => 'keyword', 'controller'=>'keyword',
+				'action'=>'get-Search-History-List1', 'currentNo' => 1)
+));
+// 2014-05-18 ADD
 
 // --------------------------------------------------------
 

@@ -12,8 +12,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     private $pnum;
     private $serverEncode;
     
-    private $groupMaxRstCount;
-    
     /**
      * init
      * @param unknown $keyword
@@ -26,7 +24,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	$this->tdCnt = 21;
     	$this->strSuggestKeywords = "";
     	$this->serverEncode = "EUC-JP";
-    	$this->groupMaxRstCount = 10;
 
     	/** 件楽履歴頁に一頁あたりのキーワード件数 */
     	$this->pnum = 100;
@@ -36,17 +33,17 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	 
     	$this->suggestAry = array("", " ",
     			"あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ",
-//     			"さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と",
-//     			"な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
-//     			"ま", "み", "む", "め", "も", "や", "ゆ", "よ", 
-//     	        "ら", "り", "る", "れ",	"ろ", "わ",
-//     			"が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ",
-//     			"だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ",
-//     			"ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
-//     			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-//     			"k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-//     			"u", "v", "w", "x", "y", "z",
-//     			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+    			"さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と",
+    			"な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
+    			"ま", "み", "む", "め", "も", "や", "ゆ", "よ", 
+    	        "ら", "り", "る", "れ",	"ろ", "わ",
+    			"が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ",
+    			"だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ",
+    			"ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
+    			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+    			"k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+    			"u", "v", "w", "x", "y", "z",
+    			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
     	);    	 
     }
     
@@ -85,26 +82,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	}    	
     	return false;
     }
-
-    public function isValidIp()
-    {
-        $dir = "filter";
-        $name = "ip.txt";
-        $ipFile = $dir. DIRECTORY_SEPARATOR. $name;
-        $fileContent = file_get_contents($ipFile);
-        $ip = $this->get_client_ip();
-         
-        $ipAry = explode("\r\n", $fileContent);
-        
-        for($i = 0, $cnt = count($ipAry); $i < $cnt; $i++) {
-            
-            if(!empty($ipAry[$i]) 
-                && false !== strpos($ipAry[$i], $ip."=")) {
-                return true;
-            }
-        }
-        return false;
-    }
     
     /**
      * 検索
@@ -131,13 +108,15 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
        		$client->setUri("http://www.google.co.jp/complete/search?hl=en&q=".urlencode($newKeyword)."&output=toolbar");
             
             //send request
-            $response = $this->sendAPIRequest($client);
+            $response = Com_Util::sendAPIRequest($client);
             if ($response !== null) {
             	$this->parseXMLResponse($response, $newKeyword, $i);
+            	
             } else {
-                //$this->makeIndex($newKeyword, $i, false);
-            	$this->makeIndex($i, false);
+                // error, 403 forbidden
+//             	$this->makeIndex($i, false);
             	$errorFlg = true;
+            	break;
             }
         }        
     	//index
@@ -215,10 +194,10 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         $client->setUri("http://www.google.com/complete/search?hl=en&output=toolbar&q=".urlencode($this->keyword));
         
         //send request
-        $response = $this->sendAPIRequest($client);
+        $response = Com_Util::sendAPIRequest($client);
         if ($response !== null) {
         	$this->parseXMLResponseAjax($response);
-        }        
+        }
     }
     
     
@@ -287,30 +266,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         }
     }
 
-    // 2014/05/18 ADD
-    public function getSearchHistoryList1PageNo($currentNo)
-    {
-    	try {
-    		$searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
-    		$count = $searchHistoryEntity->getCount();
-    		$maxPageNo = ceil($count / $this->pnum);
-    
-    		$pageNo = "<div id='pageno'><span class='snm'>ページ ：&nbsp;</span>".
-    					$this->getPageNoReverse($currentNo, $maxPageNo).
-            			"<span id='up' style='display:none;'>keyword/keyword/get-Search-History-List?currentNo=</span>".
-            			"</div>";
-    
-    		return $pageNo;
-    
-    	} catch (Zend_Db_Adapter_Exception $e) {
-    		throw $e;
-    	} catch (Zend_Exception $e) {
-    		throw $e;
-    	}
-    }
-    // 2014/05/18 ADD
-    
-    
     /**
      * 
      * @param unknown $id
@@ -366,40 +321,35 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         }        
     }
 
-    public function csvOrder($historyid, $userid) {
-        try {
-            $searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
-        
-            $data["userid"] = $userid;
-            $data["csvstatus"] = 1;
-            
-            $where["id = ?"] = $historyid;
-            
-            $searchHistoryEntity->updateHistory($data, $where);
-        } catch (Zend_Db_Adapter_Exception $e) {
-            throw $e;
-        } catch (Zend_Exception $e) {
-            throw $e;
+
+    public function isValidIp()
+    {
+        $dir = "filter";
+        $name = "ip.txt";
+        $ipFile = $dir. DIRECTORY_SEPARATOR. $name;
+        $fileContent = file_get_contents($ipFile);
+        $ip = $this->get_client_ip();
+         
+        $ipAry = explode("\r\n", $fileContent);
+    
+        for($i = 0, $cnt = count($ipAry); $i < $cnt; $i++) {
+    
+            if(!empty($ipAry[$i])
+                    && false !== strpos($ipAry[$i], $ip."=")) {
+                        return true;
+                    }
         }
+        return false;
     }
     
-
     /*------------------------------------------------------------------------
     *
     *  private
     *
     *------------------------------------------------------------------------*/
-
     
     function getClientIp($type = true)
     {
-//     	if ($checkProxy && $this->getServer('HTTP_CLIENT_IP') != null) {
-//     		$ip = $this->getServer('HTTP_CLIENT_IP');
-//     	} else if ($checkProxy && $this->getServer('HTTP_X_FORWARDED_FOR') != null) {
-//     		$ip = $this->getServer('HTTP_X_FORWARDED_FOR');
-//     	} else {
-//     		$ip = $this->getServer('REMOTE_ADDR');
-//     	}
     	if($type){
     		$ip = "HTTP_CLIENT_IP=[".$this->getServerVariable("HTTP_CLIENT_IP")."];HTTP_X_FORWARDED_FOR=[".
     		      $this->getServerVariable("HTTP_X_FORWARDED_FOR")."]; REMOTE_ADDR=[".
@@ -426,8 +376,10 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     private function parseXMLResponse($xmlContents, $keyword, $id)
     {
     	$objContents = simplexml_load_string(mb_convert_encoding($xmlContents, "utf-8","SJIS-win"));
+    	
     	$cnt = count($objContents->CompleteSuggestion);
-    
+    	$cnt = $cnt > Com_Const::MAX_RST_COUNT ? Com_Const::MAX_RST_COUNT : $cnt;
+    	
     	if ($cnt > 0) {
 			if ($id <> 1) {
 				$this->strSuggestKeywords .=
@@ -436,25 +388,23 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
 				$this->strSuggestKeywords .=
 				"<div id='".$id."' class='til'><a class='t_icon' href='#header'>|</a><span> ".$keyword."_</span></div>";
 			}
-    	}
     
-    	$this->strSuggestKeywords.= "<ul>";
-    	for($i = 0; $i < $cnt; $i++){
-    		$suggestKeyword = $objContents->CompleteSuggestion[$i]->suggestion;
-    		foreach($suggestKeyword->attributes() as $key => $val) {
-    			 
-    			if($keyword != $val){
-    				$this->strSuggestKeywords.=
-    				"<li>
-        		     <span class='sugkey'>".(string)$val."</span>";
-    				$this->strSuggestKeywords.="</li>";
-    				$this->rstCnt++;
-    			}
-    		}
-    	}
-    	$this->strSuggestKeywords.= "</ul>";
+        	$this->strSuggestKeywords.= "<ul>";
+        	for($i = 0; $i < $cnt; $i++){
+        		$suggestKeyword = $objContents->CompleteSuggestion[$i]->suggestion;
+        		foreach($suggestKeyword->attributes() as $key => $val) {
+        			 
+        			if($keyword != $val){
+        				$this->strSuggestKeywords.=
+        				"<li>
+            		     <span class='sugkey'>".(string)$val."</span>";
+        				$this->strSuggestKeywords.="</li>";
+        				$this->rstCnt++;
+        			}
+        		}
+        	}
+        	$this->strSuggestKeywords.= "</ul>";
     
-    	if ($cnt > 0){
 			$this->strSuggestKeywords .= "<br/><br/>";
 			//index
 			$this->makeIndex($id, true);
@@ -540,29 +490,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         return $ipaddress;
     }
     
-    /**
-     * APIを呼んで、サジェストキーワードを取得する
-     * @param unknown $uri
-     * @return NULL
-     */
-    private function sendAPIRequest($client)
-    {
-    	try{
-    		$response = $client->request();
-    
-    		if ($response->isSuccessful()) {
-    			return $response->getBody();
-    		} else {
-    			//$this->errOutput("err.txt", date("Y-m-d H:i:s").": ".$response->getStatus() . ": " . $response->getMessage().": ".$client->getUri(true)."\n");
-    			return null;
-    		}
-    
-    	} catch (Zend_Http_Client_Exception $e) {
-    		//echo '<p>エラーが発生しました (' .$e->getMessage(). ')</p>';
-    		return null;
-    	}
-    }
-    
     private function errOutput($errSql_file, $msg){
     
     	try{
@@ -638,55 +565,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	return '/history/index'.$pageNo.'.html';
     }
     
-//     // 2014/05/18 ADD
-//     private function getPageNoReverse($page, $tallPage){
-    
-//     	$pCon = "";
-//     	$page = $page > $tallPage ? $tallPage : $page;
-    	
-//     	$href = 'http://'.$_SERVER['HTTP_HOST'].'/history/';
-    	
-//     	if ($tallPage <= 2 * $this->pnum + 3 ){
-//     		for($i = $tallPage; $i <= 1 ; $i--){
-//     			$pCon .= ($page != $i) ? "<a href='javascript:void(0);'>".$i.
-//         			"<span style='display:none;'>".$i."</span></a> &nbsp;" : $i."&nbsp;&nbsp;";
-//     		}
-//     	}elseif($tallPage - $page <= $this->pnum + 2){
-    		 
-//     		for($i = $tallPage; $i <= $tallPage - (2 * $this->pnum + 3); $i--){
-//     			$pCon .= ($page != $i) ? "<a href='javascript:void(0);'>".$i.
-//         			"<span style='display:none;'>".$i."</span></a> &nbsp;" : $i."&nbsp;&nbsp;";
-//     		}
-//     		$pCon .= ("..."."<a href='javascript:void(0);'>1<span style='display:none;'>1</span></a> &nbsp;");
-//     	}elseif($page <= $this->pnum ){
-    		 
-//     		for($i = 2 * $this->pnum + 3; $i <= 1 ; $i--){
-//     			$pCon .= ($page != $i) ? "<a href='javascript:void(0);'>".$i.
-//         			"<span style='display:none;'>".$i."</span></a> &nbsp;" : $i."&nbsp;&nbsp;";
-//     		}
-//     		$pCon = "<a href='javascript:void(0);'>1<span style='display:none;'>".$tallPage."</span></a> &nbsp;"."...".$pCon;
-//     	}else{
-    		 
-//     		for($i = $page + $this->pnum; $i <= $page - $this->pnum ; $i--){
-//     			$pCon .= ($page != $i) ? "<a href='javascript:void(0);'>".$i.
-//         			"<span style='display:none;'>".$i."</span></a> &nbsp;" : $i."&nbsp;&nbsp;";
-//     		}
-//     		$pCon = 	"<a href='javascript:void(0);'>".$tallPage.
-//         				"<span style='display:none;'>".$tallPage."</span></a> &nbsp;".
-//         				"...&nbsp;".$pCon."...&nbsp;".
-//     					"<a href='javascript:void(0);'>1<span style='display:none;'>1</span></a> &nbsp;";
-//     	}
-    
-//     	if($page <> 1){
-//     		$pCon = "&nbsp;&nbsp;<a href='javascript:void(0);'>前へ<span style='display:none;'>".($page - 1)."</span></a> &nbsp;".$pCon;
-//     	}
-    
-//     	if($page <> $tallPage){
-//     		$pCon .= "<a href='javascript:void(0);'>次へ<span style='display:none;'>".($page + 1)."</span></a> &nbsp;" ;
-//     	}
-//     	return $pCon;
-//     }
-//     // 2014/05/18 ADD
     
     /*------------------------------------------------------------------------
      *

@@ -12,13 +12,9 @@ class Keyword_IndexController extends Zend_Controller_Action
         }
     }
 
-    public function indexAction()
-    {
-    }
+    public function indexAction() {    }
 
-    public function loginAction()
-    {
-    }
+    public function loginAction() {    }
     
     public function authAction() 
     {
@@ -26,7 +22,7 @@ class Keyword_IndexController extends Zend_Controller_Action
         $password = mb_convert_encoding($this->getRequest()->password, "utf-8","auto");
 
         $model = new Keyword_Model_User();
-        $user = $model->getUser($id, $password);
+        $user = $model->getUser($id);
         
         if ($user && $user['password'] == $password) {
             
@@ -36,17 +32,20 @@ class Keyword_IndexController extends Zend_Controller_Action
             $zend_session->type = $user["type"];
             $zend_session->username = $user["name"];
             
+            if ($user["type"] == Com_Const::USER_ADMIN) {
+                // 管理者
+                $this->_redirect('/keyword/user');
+            }
+            
             $this->_helper->layout->assign('usertype', $zend_session->type);
             $this->_helper->layout->assign('username', $zend_session->username);
             
-            $this->_helper->layout->setLayout('layout');
             $this->_helper->viewRenderer->setRender('index');
             
             return;
         }
 
-        $this->view->errormsg = 'メールもしくはパスワードが違います。';
-        $this->_helper->layout->setLayout('layout');
+        $this->view->errormsg = 'お客様ＩＤもしくはパスワードが違います。';
         $this->_helper->viewRenderer->setRender('login');
     }
     
@@ -55,8 +54,8 @@ class Keyword_IndexController extends Zend_Controller_Action
         Zend_Session::destroy();
         $this->_helper->layout->assign('usertype', null);
         $this->_helper->layout->assign('username', null);
+        $this->_helper->layout->assign('usertype', null);
         
-        $this->_helper->layout->setLayout('layout');
         $this->_helper->viewRenderer->setRender('index');
     }
 }

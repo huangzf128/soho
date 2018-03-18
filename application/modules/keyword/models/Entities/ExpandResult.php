@@ -14,15 +14,13 @@ class Keyword_Model_Entities_ExpandResult extends Db_Abstract
 		$expand->historyid = $info['historyid'];
 		$expand->result = $info['result'];
 		$expand->updatedt = $info['updatedt'];
+		$expand->status = $info['status'];
 		
-		try
-		{
+		try	{
 		    $expand->save();
 		    return true;
-		}
-		catch (Exception $e)
-		{
-			return FALSE;
+		} catch (Exception $e) {
+			return false;
 		}
 	}
 	
@@ -50,6 +48,5 @@ class Keyword_Model_Entities_ExpandResult extends Db_Abstract
 	    }
 	    return $updCnt;
 	}
-
 
 }

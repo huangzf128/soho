@@ -6,7 +6,6 @@ class Keyword_KeywordController extends Zend_Controller_Action
 	private $accessTimeLimit = 60;
 	private $accessCountLimit = 4;
 	private $userid = null;
-	public $csvExpandLevelMax = 2;
 	
     public function init()
     { 
@@ -37,7 +36,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
         	$this->_helper->layout->assign('keyword', $keyword);
         	$this->_helper->layout->assign('rstCnt', $model->getRstCnt());
         	$this->view->sk = "<font color='red'>アクセス制限のため、しばらく経ってから、検索してください。</font><br/><br/><br/>";
-        	$this->view->indextab = $model->getIndexTab();
+        	$this->view->indextab = "";
         	$this->_helper->layout->setLayout('layout');
         	return ;
         }
@@ -48,7 +47,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
             $this->_helper->layout->assign('keyword', $keyword);
 	        $this->_helper->layout->assign('rstCnt', $model->getRstCnt());
         	$this->view->sk = "<font color='red'>入力するキーワードは、25文字以内にしてください。</font><br/><br/><br/>";
-	        $this->view->indextab = $model->getIndexTab();
+	        $this->view->indextab = "";
         	$this->_helper->layout->setLayout('layout');
         	return;
         } else if(0 === $checkResult) {
@@ -61,7 +60,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
 	        $this->_helper->layout->assign('keyword', $keyword);
 	        $this->_helper->layout->assign('rstCnt', $model->getRstCnt());
 	        $this->view->sk = "<font color='red'>入力されたキーワードは、当ツールでは対象外です。</font><br/><br/><br/>";
-	        $this->view->indextab = $model->getIndexTab();
+	        $this->view->indextab = "";
         	$this->_helper->layout->setLayout('layout');
 	        
         	return;
@@ -86,7 +85,6 @@ class Keyword_KeywordController extends Zend_Controller_Action
         	$this->view->historyid = $model->registSearchHistoryResult();
         }
     }
-    
     
     /**
      * Ajax検索
@@ -120,53 +118,6 @@ class Keyword_KeywordController extends Zend_Controller_Action
         echo mb_convert_encoding ( $csvdata, "sjis", "utf-8");
     }
     
-    public function getCsvFileOrderAction() 
-    {
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender(true);
-        
-        // 予約に入れる
-        $historyid = $this->getRequest()->historyid;
-        $model = new Keyword_Model_SuggestKeyword(null);
-        $model->csvOrder($historyid, $this->userid);
-        
-        $csvModel = new Keyword_Model_Csv();
-        $csvModel->registCsvOrder($this->userid, $historyid);
-        
-        
-        // expand insert
-        
-        //$rst = $csvModel->registExpand($historyid);
-        
-        //$this->createExpandCsv($historyid);
-        
-        echo "予約できました。";
-    }
-    
-    
-    private function createExpandCsv($historyid) {
-        
-        $model = new Keyword_Model_SuggestKeyword(null);
-        $csvModel = new Keyword_Model_Csv();
-        
-        // check, is need 
-         
-        // get history
-        $expandRst = $csvModel->getExpandResult($historyid);
-        $expandKeywords = $expandRst["result"];
-        
-        // expand Search
-        for ($i = 0; $i < $this->csvExpandLevelMax; $i++) {
-            if (empty($expandRst["level". ($i + 1)])) {
-                $expandKeywords = $csvModel->expandLevel($expandKeywords);
-                $csvModel->updateExpandLevel($historyid, $expandKeywords, $i + 1);
-            } else {
-                $expandKeywords = $expandRst["level".($i + 1)];
-            }
-        }
-
-        return 0;
-    }
     
     /**
      * 検索履歴リストを取得する
@@ -220,10 +171,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
             
             if (!$result) {
                 // データ存在しない
-                $helper = $this->_helper->getHelper('Layout');
-                $layout = $helper->getLayoutInstance();
-                
-                $layout->assign('content', $this->view->render("error/error.phtml"));
+                $this->_helper->assign('content', $this->view->render("error/error.phtml"));
                 
                 //$errHtml = $layout->render();
                 //echo $errHtml;
@@ -241,6 +189,10 @@ class Keyword_KeywordController extends Zend_Controller_Action
         	echo $file.$script;
         }        
     }
+    
+    /*------------------------------------------------------------------------
+     *  private
+     *------------------------------------------------------------------------*/
     
     /**
      * キーワードの検索履歴を取得する(DB)

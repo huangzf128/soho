@@ -39,7 +39,7 @@ fjs.parentNode.insertBefore(js, fjs);
 <div id="lefticon3"><script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script><g:plusone></g:plusone></div>
 
 <div id="lefticon4">
-<?php if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) {
+<?php if ($this->layout()->usertype != null) {
     echo "<a href='/keyword/index/logout'>ログアウト</a>";
 } else {
     echo "<a href='/keyword/index/login'>ログイン</a>";
@@ -50,12 +50,15 @@ fjs.parentNode.insertBefore(js, fjs);
 </div>
 <div id="wrapper">
 <header>
-<div style="float:right;color:blue;margin-top:0px;">
-<?php if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) { 
+
+<?php if ($this->layout()->usertype != null) { 
+        echo '<div style="float:right;color:blue;margin-top:0px;">';
         $username = "こんにちは、<B>".$this->layout()->username."</B>　様　";
         echo $username;
+        echo '</div>';
+        echo '<div id="csv-download" >CSV管理</div>';
 } ?>
-</div>
+
 
 <a href="/" title="グーグルサジェスト キーワード一括ダウンロードツール"></a></header>
 <h1><span class="txtclear">グーグルサジェスト キーワード一括ＤＬツールGoogle Suggest Keyword Package Download Tool</span></h1>
@@ -88,7 +91,7 @@ Copyright (C) 1st-MEDIA,inc. All Rights Reserved.
 <br>
 
 <script	src="<?php echo $this->baseUrl(); ?>_library/jquery-1.9.1.js" language="javascript"></script>
-<script	src="<?php echo $this->baseUrl(); ?>_library/jMenu.js?date=20140725" language="javascript"></script>
+<script	src="<?php echo $this->baseUrl(); ?>_library/jMenu_new.js?date=20180305" language="javascript"></script>
 <script	src="<?php echo $this->baseUrl(); ?>_library/spin.min.js" language="javascript"></script>
 <script>
 var clicked = "";
@@ -196,7 +199,10 @@ $(function(){
 		}
 	});
 
-	
+	$("#csv-download").click(function(e){
+		window.location.href = "/keyword/csv";
+		e.stopPropagation();
+	});
 });
 
 

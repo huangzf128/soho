@@ -15,14 +15,11 @@ class Keyword_Model_Entities_CsvOrderUser extends Db_Abstract
 		$row->userid = $data['userid'];
 		$row->updatedt = $data['updatedt'];
 		
-		try
-		{
+		try {
 		    $row->save();
 		    return true;
-		}
-		catch (Exception $e)
-		{
-			return FALSE;
+		} catch (Exception $e) {
+			return false;
 		}
 	}
 	
@@ -34,23 +31,62 @@ class Keyword_Model_Entities_CsvOrderUser extends Db_Abstract
 	public function getRowById($historyid)
 	{
 	    $result = $this->fetchRow($this->select()->where('historyid = ?', $historyid));
-	    if (!empty($result))
-	    {
+	    if (!empty($result)) {
 	        return $result;
 	    }
-	    return FALSE;
+	    return false;
 	}
 	
 	public function getCsvOrderList($usreid) {
 	    
-	    $result = $this->fetchAll($this->select()
-	               ->where("userid = ?", $usreid)
-	               ->order('updatedt DESC'));
-	    if (!empty($result))
-	    {
+	    $result = $this->fetchAll(
+	            $this->select()->setIntegrityCheck(FALSE)
+	            ->from(array("c"=>"csvorderuser"), array("*"))
+	            ->joinLeft(array("h"=>"searchhistory"),
+	                    "c.historyid = h.id",
+	                    array("registdt"=>"h.registdt", "kword"=>"h.kword"))
+	            ->joinLeft(array("e"=>"expandresult"),
+	                    "c.historyid = e.historyid",
+	                    array("status"=>"e.status"))
+               ->where("userid = ?", $usreid)
+               ->order('updatedt DESC'));
+	    
+	    if (!empty($result)) {
 	        return $result;
 	    }
-	    return FALSE;	
+	    return false;	
 	}
 	
+	public function getExecutingCsv($userid) {
+	    $result = $this->fetchAll(
+    	            $this->select()->setIntegrityCheck(FALSE)
+    	            ->from(array("c"=>"csvorderuser"), array("historyid"))
+    	            ->joinLeft(array("e"=>"expandresult"),
+    	                    "c.historyid = e.historyid",
+    	                    array())
+    	            ->where("e.status = 0  and c.userid = ? ", $userid)
+	            );
+	    
+	    if (!empty($result)) {
+	        return $result;
+	    }
+	    return false;
+	}
+	
+	public function getNotExecuteCsv($usreid) {
+	     
+	    $result = $this->fetchAll(
+	            $this->select()->setIntegrityCheck(FALSE)
+	            ->from(array("c"=>"csvorderuser"), array("c.historyid"))
+	            ->joinLeft(array("e"=>"expandresult"),
+	                    "c.historyid = e.historyid",
+	                    array())
+	            ->where("e.historyid IS NULL AND c.userid = ?", $usreid)
+	            ->order('c.updatedt DESC'));
+	     
+	    if (!empty($result)) {
+	        return $result;
+	    }
+	    return false;
+	}
 }

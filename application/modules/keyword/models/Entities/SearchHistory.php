@@ -16,15 +16,13 @@ class Keyword_Model_Entities_SearchHistory extends Db_Abstract
 		$srchRst->rstcnt = $info['rstcnt'];
 		$srchRst->clientip = $info['clientip'];
 		$srchRst->indextab = $info['indextab'];
-		$srchRst->sk = $info['sk'];	
+		$srchRst->sk = $info['sk'];
 		
-		try
-		{
+		try	{
 			$srchRst->save();
 			return $srchRst->id;
-		}
-		catch (Exception $e)
-		{
+		} catch (Exception $e) {
+		    Keyword_Model_Log::registErrorLog($e->getMessage(), "Keyword_Model_Entities_SearchHistory:regist", null, null);
 			return FALSE;
 		}
 	}

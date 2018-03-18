@@ -31,16 +31,6 @@ $spmode = true;
 <title>Googleサジェストから検索ワード候補を一括ダウンロード『グーグルサジェスト キーワード一括ＤＬツール』</title>
 <meta name="description" content="グーグルのサジェスト機能を使用して、検索ワード候補を一覧表で表示させて、簡単にcsvで一括ダウンロードできるツールが『グーグルサジェスト キーワード一括ＤＬツール』です。最新のキーワード調査やホームページのコンテンツ作成などにお役立てください。">
 <meta name="keywords" content="Googleサジェスト,キーワード,csv,一括,ダウンロード">
-<style type="text/css">
-#csv-download {
-    clear:both;float:right;
-    background-color: #2379fd; color:white;
-    display: inline-box;line-height:25px;
-    width: 90px;height:25px;
-    margin:24px 40px auto auto;
-    text-align:center;border-radius:4px;cursor:pointer;
-}
-</style>
 <link rel="stylesheet" href="/_css/styles.css?t=<?php echo time(); ?>" type="text/css" />
 <!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 <script>
@@ -73,7 +63,7 @@ fjs.parentNode.insertBefore(js, fjs);
 <div id="lefticon3"><script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script><g:plusone<?php if ($spmode){ echo ' size="tall"' ; } ?>></g:plusone></div>
 
 <div id="lefticon4">
-<?php if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) {
+<?php if ($this->layout()->usertype != null) {
     echo "<a href='/keyword/index/logout'>ログアウト</a>";
 } else {
     echo "<a href='/keyword/index/login'>ログイン</a>";
@@ -97,14 +87,16 @@ if ( $spmode ) {
 <div id="wrapper">
 <header>
 
-<div style="float:right;color:blue;margin-top:0px;">
-<?php if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) { 
+<?php if ($this->layout()->usertype != null) { 
+        echo '<div style="float:right;color:blue;margin-top:0px;">';
+
         $username = "こんにちは、<B>".$this->layout()->username."</B>　様　";
         echo $username;
-} ?>
-</div>
 
-<div id="csv-download" >CSV管理</div>
+        echo '</div>';
+
+        echo '<div id="csv-download" >CSV管理</div>';
+} ?>
 
 <a href="/" title="グーグルサジェスト キーワード一括ダウンロードツール"></a>
 
@@ -213,7 +205,7 @@ include '/home/ad8-ssl/www/gskw/sp/adscript/result_ad_3.txt';
 } ?>
 
 
-<script	src="<?php echo $this->baseUrl(); ?>_library/jMenu_new.js?date=20180211" language="javascript"></script>
+<script	src="<?php echo $this->baseUrl(); ?>_library/jMenu_new.js?date=20180305" language="javascript"></script>
 <script	src="<?php echo $this->baseUrl(); ?>_library/spin.min.js" language="javascript"></script>
 <script>
 var clicked = "";
@@ -249,7 +241,7 @@ $(function(){
 	$("#keywordFrm").submit(onFrmSubmit);
 
 	$("#csv-download").click(function(e){
-		window.location.href = "/csv";
+		window.location.href = "/keyword/csv";
 		e.stopPropagation();
 	});
 });

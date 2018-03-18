@@ -5,41 +5,42 @@ class Keyword_Model_Entities_SearchUser extends Db_Abstract
 	protected $_use_adapter = 'front_db';
 			
 	/**
-	 * 検索結果を登録する
+	 * 登録する
 	 */
 	public function regist($info)
 	{
 		$srchRst = $this->createRow();
 	
 		$srchRst->id = $info['id'];
-		$srchRst->name = $info['username'];
+		$srchRst->name = $info['name'];
 		$srchRst->email = $info['email'];
 		$srchRst->password = $info['password'];
 		
 		$srchRst->type = $info['type'];
-		$srchRst->updatetime = $info['updatetime'];
-		$srchRst->deleteflag = $info['deleteflag'];
+		$srchRst->valid = $info['valid'];
+		$srchRst->updatedt = $info['updatedt'];
 		
-		try
-		{
+		try	{
 			$srchRst->save();
 			return $srchRst->id;
-		}
-		catch (Exception $e)
-		{
+		} catch (Exception $e) {
 			return FALSE;
 		}
 	}
 	
-	/**
-	 * 検索履歴を取得する
-	 * @return unknown|boolean
-	 */
+	public function getAllUserList()
+	{	    
+	    $result = $this->fetchAll($this->select()->order('updatedt DESC'));
+	    if (!empty($result)) {
+	    	return $result;
+	    }	    
+	    return FALSE;	     
+	}
+	
 	public function getList($offset, $pnum)
 	{	    
 	    $result = $this->fetchAll($this->select()->order('updatetime DESC')->limit($pnum, $offset));
-	    if (!empty($result))
-	    {
+	    if (!empty($result)) {
 	    	return $result;
 	    }	    
 	    return FALSE;	     
@@ -52,7 +53,7 @@ class Keyword_Model_Entities_SearchUser extends Db_Abstract
 	 */
 	public function getRowById($id)
 	{
-	    $result = $this->fetchRow($this->select()->where('deleteflag = 0 and valid = 0 and id = ?', $id));
+	    $result = $this->fetchRow($this->select()->where('valid = 1 and id = ?', $id));
 	    if (!empty($result))
 	    {
 	    	return $result;
@@ -67,17 +68,12 @@ class Keyword_Model_Entities_SearchUser extends Db_Abstract
 	 */
 	public function deleteRowById($id)
 	{
-	    $result = $this->fetchRow($this->delete('id = '.$id ));
-	    if (!empty($result))
-	    {
-	    	return $result;
-	    }
-	    return FALSE;	     
+	    $where = $this->getAdapter()->quoteInto('id = ?', $id);
+	    $this->delete($where);    
 	}
 	
 	public function getCount()
 	{
- 	    //$result = $this->fetchAll($this->select());
 	    $sql = $this->select()->from($this, 'COUNT(*) as count');
 	    $result = $this->fetchAll($sql);
 	    
@@ -88,5 +84,13 @@ class Keyword_Model_Entities_SearchUser extends Db_Abstract
 	    return FALSE;
 	}
 
-	
+	public function updateUser($data, $where)
+	{
+	    try {
+	        $updCnt = $this->update($data, $where);
+	    } catch(Exception $e) {
+	        return false;
+	    }
+	    return $updCnt;
+	}
 }
