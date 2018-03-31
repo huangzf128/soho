@@ -59,7 +59,7 @@ $router->addRoute('historyDetailUrl',
 		new Zend_Controller_Router_Route_Regex('history/archive/(.+)',
 				array('module' => 'keyword', 'controller'=>'keyword', 
 				        'action'=>'get-Search-History-Detail-File'),
-		        array('fileName_id' => 1)));
+		        array('filename' => 1)));
 
 
 

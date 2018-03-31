@@ -152,11 +152,11 @@ class Keyword_KeywordController extends Zend_Controller_Action
     public function getSearchHistoryDetailFileAction()
     {
 
-        $fileName_id = $this->getRequest()->fileName_id;
+        $fileName = $this->getRequest()->filename;
         $model = new Keyword_Model_SuggestKeyword(null);
         
-        $fileName = substr($fileName_id, 0, strrpos($fileName_id, '_'));
-        $id = substr($fileName_id, strrpos($fileName_id, '_') + 1);
+        $registdt = substr($fileName, 0, strrpos($fileName, '_'));
+        $keyword = substr($fileName, strrpos($fileName, '_') + 1);
         
         $file = $model->getResultFile($fileName);
         
@@ -164,9 +164,8 @@ class Keyword_KeywordController extends Zend_Controller_Action
             
             $result = false;
             
-            if(isset($id)) {
-                $result = $this->getSearchHistoryDetailAction($id);
-                $this->view->historyid = $id;
+            if(isset($registdt)) {
+                $result = $this->getSearchHistoryDetailAction($registdt, $keyword);
             }
             
             if (!$result) {
@@ -182,11 +181,12 @@ class Keyword_KeywordController extends Zend_Controller_Action
             $this->_helper->layout->disableLayout();
             $this->_helper->viewRenderer->setNoRender(true);
             
+            // 既存の履歴は、表示・非表示でIPCSVを制御する            
             $script = "";
             if($model->isValidIp()) {
                 $script = "<script>$('.csvprime').show();</script>";
             }            
-        	echo $file.$script;
+            	echo $file.$script;
         }        
     }
     
@@ -197,12 +197,12 @@ class Keyword_KeywordController extends Zend_Controller_Action
     /**
      * キーワードの検索履歴を取得する(DB)
      */
-    private function getSearchHistoryDetailAction($id)
+    private function getSearchHistoryDetailAction($registdt, $keyword)
     {
         //$id = $this->getRequest()->id;
     
         $model = new Keyword_Model_SuggestKeyword(null);
-        $result = $model->getSearchHistoryDetail($id);
+        $result = $model->getSearchHistoryDetail($registdt, $keyword);
 
         if ($result) {
             
@@ -213,6 +213,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
             $layout->assign('rstCnt', $result['rstcnt']);
             $this->view->sk = $result['sk'];
             $this->view->indextab = $result['indextab'];
+            $this->view->historyid = $result['id'];
             
             // change phtml name
             $this->_helper->viewRenderer->setRender('get-suggest-keyword');

@@ -273,19 +273,31 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
      * @throws Zend_Exception
      * @return unknown
      */
-    public function getSearchHistoryDetail($id)
+    public function getSearchHistoryDetail($registdt, $keyword)
     {
         try {
         	$searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
-        	 
-        	$result = $searchHistoryEntity->getRowById($id);
-        	return $result;
+        	$rows = $searchHistoryEntity->getRowByRegDt($registdt);
+        	$cnt = count($rows);
+        	
+        	if($cnt == 1) {
+        	    return $rows[0];
+        	} else if ($cnt > 1) {
+        	    for($i = 0; $i < $cnt; $i++) {
+        	        $row = $rows[$i];
+        	        if ($row["kword"] == $keyword) {
+        	            return $row;
+        	        }
+        	    }
+        	}
+        	
+        	return null;
         
         } catch (Zend_Db_Adapter_Exception $e) {
         	throw $e;
         } catch (Zend_Exception $e) {
         	throw $e;
-        }        
+        }
     }
     
     public function deleteKeywordList($idList)

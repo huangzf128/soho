@@ -81,6 +81,16 @@ class Keyword_Model_Entities_SearchHistory extends Db_Abstract
 	}
 	// 2014/05/18 ADD
 	
+	public function getRowByRegDt($registdt)
+	{
+	    $result = $this->fetchAll($this->select()->where("DATE_FORMAT(registdt, '%Y%m%d%H%i%s') = ? ", $registdt));
+	    if (!empty($result))
+	    {
+	        return $result;
+	    }
+	    return FALSE;
+	}
+	
 	public function updateHistory($data, $where)
 	{
 		try{
