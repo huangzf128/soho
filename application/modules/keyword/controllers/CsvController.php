@@ -47,7 +47,7 @@ class Keyword_CsvController extends Zend_Controller_Action
                 Com_Util::sendMulitRequest($url_list, 2);
             }
         } catch (Exception $e) {
-            Keyword_Model_Log::registErrorLog($e->getMessage(), "csvFileOrderAction", null, null);
+            Com_Log::registErrorLog($e->getMessage(), "csvFileOrderAction", null, null, Com_Const::GOOGLE);
         }
     
         echo $result ? "1" : "0";
@@ -89,7 +89,7 @@ class Keyword_CsvController extends Zend_Controller_Action
                 } while(!empty($historyid));
                 
             } catch(Exception $e) {
-                Keyword_Model_Log::registErrorLog($e->getMessage(), "expandResultAjaxAction: catch ", "historyid: ".$historyid, null);
+                Com_Log::registErrorLog($e->getMessage(), "expandResultAjaxAction: catch ", "historyid: ".$historyid, null, Com_Const::GOOGLE);
             }
         }
     }
@@ -131,7 +131,7 @@ class Keyword_CsvController extends Zend_Controller_Action
             // expand Search
             for ($i = 0; $i < Com_Const::CSV_EXPAND_LEVEL_MAX; $i++) {
                 
-                Keyword_Model_Log::registExpandLog("start: level".($i + 1), $historyid, null, null);
+                Com_Log::registExpandLog("start: level".($i + 1), $historyid, null, null, Com_Const::GOOGLE);
                 
                 if (empty($expandRst["level". ($i + 1)])) {
                     $expandKeywords = $csvModel->expandLevel($expandKeywords);
@@ -140,6 +140,10 @@ class Keyword_CsvController extends Zend_Controller_Action
 
                         $csvModel->updateExpandStatus($historyid, Com_Const::STATUS_FORBIDDEN);
                         return false;
+                    } elseif ($expandKeywords == Com_Const::ERROR) {
+                    
+                        $csvModel->updateExpandStatus($historyid, Com_Const::STATUS_ERROR);
+                        return false;                        
                     } else {
                         $csvModel->updateExpandLevel($historyid, $expandKeywords, $i + 1);
                     }
@@ -149,13 +153,13 @@ class Keyword_CsvController extends Zend_Controller_Action
                 sleep(20);
             }
             
-            Keyword_Model_Log::registExpandLog("end", $historyid, null, null);
+            Com_Log::registExpandLog("end", $historyid, null, null, Com_Const::GOOGLE);
             
             $csvModel->updateExpandStatus($historyid, Com_Const::STATUS_FINISH);
         } catch (Exception $e) {
             
             $csvModel->updateExpandStatus($historyid, Com_Const::STATUS_ERROR);
-            Keyword_Model_Log::registErrorLog($e->getMessage(), "createExpandCsv: catch ", "historyid: ".$historyid, null);
+            Com_Log::registErrorLog($e->getMessage(), "createExpandCsv: catch ", "historyid: ".$historyid, null, Com_Const::GOOGLE);
             return false;
         }
         

@@ -15,6 +15,7 @@ class Keyword_Model_Entities_ExpandResult extends Db_Abstract
 		$expand->result = $info['result'];
 		$expand->updatedt = $info['updatedt'];
 		$expand->status = $info['status'];
+		$expand->site = $info['site'];
 		
 		try	{
 		    $expand->save();
@@ -29,9 +30,12 @@ class Keyword_Model_Entities_ExpandResult extends Db_Abstract
 	 * @param unknown $historyid
 	 * @return unknown|boolean
 	 */
-	public function getRowById($historyid)
+	public function getRowById($historyid, $site)
 	{
-	    $result = $this->fetchRow($this->select()->where('historyid = ?', $historyid));
+	    $result = $this->fetchRow($this->select()
+	               ->where('historyid = ?', $historyid)
+                   ->where('site = ?', $site));
+	    
 	    if (!empty($result))
 	    {
 	        return $result;

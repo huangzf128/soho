@@ -160,6 +160,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
         
         $file = $model->getResultFile($fileName);
         
+        // 存在チェック
         if($file === false) {
             
             $result = false;
@@ -171,9 +172,6 @@ class Keyword_KeywordController extends Zend_Controller_Action
             if (!$result) {
                 // データ存在しない
                 $this->_helper->assign('content', $this->view->render("error/error.phtml"));
-                
-                //$errHtml = $layout->render();
-                //echo $errHtml;
             }
             
         } else {

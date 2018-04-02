@@ -9,6 +9,7 @@ Class Com_Const
 	const CSV_EXPAND_PER_WAITTIME = 60;        // API呼びだし待ちタイム
 
 	const MAX_RST_COUNT = 10;                  // 取得最大キーワード数
+	const EAPPID_RETRY_COUNT = 5;              // Yahoo専用
 	
 	// -------------------------------------------
 	//     プログラム用 
@@ -16,12 +17,15 @@ Class Com_Const
 	
 	const API_AMAZON = "http://completion.amazon.co.jp/search/complete?mkt=6&search-alias=aps&q=";
 	const API_BING = "http://api.bing.com/qsonhs.aspx?mkt=ja-JP&q=";
-	const API_YAHOO = "";
-	const API_YOUTUBE = "";
+	const API_YAHOO = "http://assist.search.yahooapis.jp/AssistSearchService/V1/webassistSearch?output=iejson&callback=ytopAssist&";
+	const API_YOUTUBE = "http://clients1.google.co.jp/complete/search?hl=ja&ds=yt&client=firefox&q=";
 	
 	const KEY = 'gskwazkwyakwytkw2018.LONGLONGLONG';
 	
 	const FORBIDDEN = "Forbidden";
+	const EAPPIDERR = "eappiderr";
+	const ERROR = "error";
+	
 	
 	// CSV取得状況
 	const STATUS_ING = 0;

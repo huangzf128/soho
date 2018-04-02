@@ -108,7 +108,7 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
        		$client->setUri("http://www.google.co.jp/complete/search?hl=en&q=".urlencode($newKeyword)."&output=toolbar");
             
             //send request
-            $response = Com_Util::sendAPIRequest($client);
+            $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE);
             if ($response !== null) {
             	$this->parseXMLResponse($response, $newKeyword, $i);
             	
@@ -194,7 +194,7 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         $client->setUri("http://www.google.com/complete/search?hl=en&output=toolbar&q=".urlencode($this->keyword));
         
         //send request
-        $response = Com_Util::sendAPIRequest($client);
+        $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE);
         if ($response !== null) {
         	$this->parseXMLResponseAjax($response);
         }

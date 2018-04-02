@@ -24,7 +24,7 @@ class Keyword_IndexController extends Zend_Controller_Action
         $model = new Keyword_Model_User();
         $user = $model->getUser($id);
         
-        if ($user && $user['password'] == $password) {
+        if ($user && $user['password'] == $password && strpos($user["site"], Com_Const::GOOGLE."") !== false) {
             
             $zend_session = new Zend_Session_Namespace("auth");
             

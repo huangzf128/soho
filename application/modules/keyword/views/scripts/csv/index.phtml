@@ -14,7 +14,7 @@ if ($this->orders) {
         $status = $row["status"];
         
         echo   '<tr>'.
-        	       '<td><a href="/history/archive/'.$time.'_'.$keyword.'_'.$id.'">'.$keyword.'</a><span style="display:none;">'.
+        	       '<td><a href="/history/archive/'.$time.'_'.$keyword.'">'.$keyword.'</a><span style="display:none;">'.
                         $row['historyid'].'</span><span style="display:none;">'.$time.'</span></td>'.
         	       '<td>'.$row["updatedt"].'</td>';
         

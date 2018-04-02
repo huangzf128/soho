@@ -22,8 +22,7 @@ class Keyword_Model_Entities_SearchHistory extends Db_Abstract
 			$srchRst->save();
 			return $srchRst->id;
 		} catch (Exception $e) {
-		    Keyword_Model_Log::registErrorLog($e->getMessage(), "Keyword_Model_Entities_SearchHistory:regist", null, null);
-			return FALSE;
+			throw $e;
 		}
 	}
 	
@@ -116,21 +115,6 @@ class Keyword_Model_Entities_SearchHistory extends Db_Abstract
 	    return FALSE;	     
 	}
 	
-	/**
-	 * ゲットレコード
-	 * @param unknown $id
-	 * @return unknown|boolean
-	 */
-	public function deleteRowById($id)
-	{
-	    $result = $this->fetchRow($this->delete('id = '.$id ));
-	    if (!empty($result))
-	    {
-	    	return $result;
-	    }
-	    return FALSE;	     
-	}
-	
 	public function getCount()
 	{
  	    //$result = $this->fetchAll($this->select());
@@ -144,5 +128,18 @@ class Keyword_Model_Entities_SearchHistory extends Db_Abstract
 	    return FALSE;
 	}
 
-	
+	/**
+	 * ゲットレコード
+	 * @param unknown $id
+	 * @return unknown|boolean
+	 */
+	public function deleteRowById($id)
+	{
+	    $result = $this->fetchRow($this->delete('id = '.$id ));
+	    if (!empty($result))
+	    {
+	        return $result;
+	    }
+	    return FALSE;
+	}
 }

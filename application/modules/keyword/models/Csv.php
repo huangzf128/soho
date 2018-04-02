@@ -9,6 +9,7 @@ class Keyword_Model_Csv extends Db_Abstract{
         $data["userid"] = $userid;
         $data["historyid"] = $historyid;
         $data["updatedt"] = date('Y-m-d H:i:s');
+        $data["site"] = Com_Const::GOOGLE;
         
         $dao = new Keyword_Model_Entities_CsvOrderUser();
         return $dao->regist($data);
@@ -17,13 +18,13 @@ class Keyword_Model_Csv extends Db_Abstract{
     // 予約したCSVを取得する
     public function getCsvOrderList($userid) {
         $dao = new Keyword_Model_Entities_CsvOrderUser();
-        $orders = $dao->getCsvOrderList($userid);
+        $orders = $dao->getCsvOrderList($userid, Com_Const::GOOGLE);
         return $orders;
     }
     
     public function getNotExecuteCsvId($usreid) {
         $dao = new Keyword_Model_Entities_CsvOrderUser();
-        $rows = $dao->getNotExecuteCsv($usreid);
+        $rows = $dao->getNotExecuteCsv($usreid, Com_Const::GOOGLE);
         if (count($rows)) {
             return $rows[0]["historyid"];
         } else {
@@ -34,7 +35,7 @@ class Keyword_Model_Csv extends Db_Abstract{
     // 実行中の処理があるか
     public function hasExecutingCsv($userid) {
         $dao = new Keyword_Model_Entities_CsvOrderUser();
-        $rows = $dao->getExecutingCsv($userid);
+        $rows = $dao->getExecutingCsv($userid, Com_Const::GOOGLE);
         if (count($rows) == 0) {
             return false;
         }
@@ -56,6 +57,7 @@ class Keyword_Model_Csv extends Db_Abstract{
         $data["result"] = $skStr;
         $data["updatedt"] = date('Y-m-d H:i:s');
         $data["status"] = 0;
+        $data["site"] = Com_Const::GOOGLE;
         
         $rst = $expandDao->regist($data);
         
@@ -72,6 +74,7 @@ class Keyword_Model_Csv extends Db_Abstract{
 	    
 	    $where = array();
 	    $where["historyid = ?"] = $historyid;
+	    $where["site = ?"] = Com_Const::GOOGLE;
 	    
 	    $rst = $dao->updateExpand($data, $where);
 	    
@@ -80,7 +83,7 @@ class Keyword_Model_Csv extends Db_Abstract{
 	
 	public function getExpandResult($historyid){
 	    $dao = new Keyword_Model_Entities_ExpandResult();
-	    $row = $dao->getRowById($historyid);
+	    $row = $dao->getRowById($historyid, Com_Const::GOOGLE);
 	    return $row;
 	}
 	
@@ -94,7 +97,8 @@ class Keyword_Model_Csv extends Db_Abstract{
 	     
 	    $where = array();
 	    $where["historyid = ?"] = $historyid;
-	     
+	    $where["site = ?"] = Com_Const::GOOGLE;
+	    
 	    $rst = $dao->updateExpand($data, $where);
 	    return $rst;
 	}
@@ -125,12 +129,15 @@ class Keyword_Model_Csv extends Db_Abstract{
 	        }
 	        
 	        $client->setUri("http://www.google.co.jp/complete/search?hl=en&q=".urlencode($keyword)."&output=toolbar");
-	        
-	        $response = Com_Util::sendAPIRequest($client);
+	        $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE);
+
 	        if ($response == Com_Const::FORBIDDEN) {
 	            
 	            return Com_Const::FORBIDDEN;
-	        } elseif ($response !== null) {
+            } elseif ($response == null) {
+                // some error
+                return Com_Const::ERROR;	            
+	        } else {
 	            $rstWord = $this->parseXMLResponseCsv($response, $groupNm, $keyword);
 	            
 	            if (!empty($rstWord)) {
@@ -264,7 +271,7 @@ class Keyword_Model_Csv extends Db_Abstract{
 	    $cnt = count($objContents->CompleteSuggestion);
 	    
 	    if ($cnt == 0) {
-	        Keyword_Model_Log::registApiErrorLog($xmlContents, "parseXMLResponseCsv", "0件", $keyword);
+	        //Com_Log::registApiErrorLog($xmlContents, "parseXMLResponseCsv", "0件", $keyword, Com_Const::GOOGLE);
 	        return "";
 	    }
 	    

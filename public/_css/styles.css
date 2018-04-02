@@ -686,7 +686,7 @@ p#loginpg {
 	}	
 }
 
-#csv-download {
+#csv-download, #user-manager {
     clear:both;float:right;
     background-color: #2379fd; color:white;
     display: inline-box;line-height:25px;

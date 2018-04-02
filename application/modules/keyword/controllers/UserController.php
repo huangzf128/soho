@@ -42,11 +42,12 @@ class Keyword_UserController extends Zend_Controller_Action
         
         $id = $user["id"];
         $password = $user["p"];
+        $site = $user["site"];
         
         $userModel = new Keyword_Model_User();
         $user = $userModel->getUser($id);
         
-        if ($user != null && $user['password'] == $password) {
+        if ($user != null && $user['password'] == $password && strpos($user["site"], $site) !== false) {
             echo Com_Util::encrypt($user["name"]);
             return;
         }
@@ -63,7 +64,12 @@ class Keyword_UserController extends Zend_Controller_Action
         $data["name"] = $this->getRequest()->name;
         $data["email"] = $this->getRequest()->email;
         $data["password"] = $this->getRequest()->password;
-        
+        $site = $this->getRequest()->site;
+        if ($site == null) {
+            $data["site"] = "";
+        } else {
+            $data["site"] = implode("", $site);
+        }
         
         $model = new Keyword_Model_User();
         $rst = $model->registUser($data);
@@ -74,6 +80,7 @@ class Keyword_UserController extends Zend_Controller_Action
             $this->view->name = $data["name"];
             $this->view->email = $data["email"];
             $this->view->password = $data["password"];
+            $this->view->site = $data["site"];
         }
         
         $this->_forward('index');
@@ -96,7 +103,7 @@ class Keyword_UserController extends Zend_Controller_Action
         $data["name"] = $this->getRequest()->updname;
         $data["email"] = $this->getRequest()->updemail;
         $data["password"] = $this->getRequest()->updpassword;
-        
+        $data["site"] = $this->getRequest()->site;
         
         $model = new Keyword_Model_User();
         $model->updateUser($data, $id);

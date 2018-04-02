@@ -31,7 +31,7 @@ $spmode = true;
 <title>Googleサジェストから検索ワード候補を一括ダウンロード『グーグルサジェスト キーワード一括ＤＬツール』</title>
 <meta name="description" content="グーグルのサジェスト機能を使用して、検索ワード候補を一覧表で表示させて、簡単にcsvで一括ダウンロードできるツールが『グーグルサジェスト キーワード一括ＤＬツール』です。最新のキーワード調査やホームページのコンテンツ作成などにお役立てください。">
 <meta name="keywords" content="Googleサジェスト,キーワード,csv,一括,ダウンロード">
-<link rel="stylesheet" href="/_css/styles.css?t=<?php echo time(); ?>" type="text/css" />
+<link rel="stylesheet" href="/_css/styles.css?ver=1" type="text/css" />
 <!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -45,22 +45,26 @@ $spmode = true;
 </script>
 </head>
 <body>
+
 <div id="header" class="clearfix"><p>グーグルサジェストのキーワード候補をまとめてｃｓｖでダウンロードできるツール</p>
+
 <div id="fav">
 
-<div id="lefticon1"><a href="https://twitter.com/share" class="twitter-share-button" <?php if ($spmode){ echo 'data-count="vertical"' ; } ?> data-url="http://www.gskw.net/" data-text="グーグルサジェスト キーワード一括ＤＬツール">Tweet</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script></div>
+<div id="lefticon1">
+<div class="ninja_onebutton">
+<script type="text/javascript">
+//<![CDATA[
+(function(d){
+if(typeof(window.NINJA_CO_JP_ONETAG_BUTTON_1f1cb8d5c389eda192219523fc99ffec)=='undefined'){
+    document.write("<sc"+"ript type='text\/javascript' src='//omt.shinobi.jp\/b\/1f1cb8d5c389eda192219523fc99ffec'><\/sc"+"ript>");
+}else{
+    window.NINJA_CO_JP_ONETAG_BUTTON_1f1cb8d5c389eda192219523fc99ffec.ONETAGButton_Load();}
+})(document);
+//]]>
+</script><span class="ninja_onebutton_hidden" style="display:none;"></span><span style="display:none;" class="ninja_onebutton_hidden"></span>
+</div>
+</div>
 
-<div id="fb-root"></div><script>(function(d, s, id) {
-var js, fjs = d.getElementsByTagName(s)[0];
-if (d.getElementById(id)) return;
-js = d.createElement(s); js.id = id;
-js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1";
-fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script><div class="fb-like" data-href="https://www.gskw.net/" data-send="false" data-layout="<?php if ($spmode){ echo 'box' ; } else { echo 'button'; } ?>_count" data-width="450" data-show-faces="true"></div>
-
-<div id="lefticon2">　<a href="http://b.hatena.ne.jp/entry/http://www.gskw.net/" class="hatena-bookmark-button" data-hatena-bookmark-title="グーグルサジェスト キーワード一括ＤＬツール" data-hatena-bookmark-layout="simple-balloon" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></div>
-
-<div id="lefticon3"><script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script><g:plusone<?php if ($spmode){ echo ' size="tall"' ; } ?>></g:plusone></div>
 
 <div id="lefticon4">
 <?php if ($this->layout()->usertype != null) {
@@ -87,16 +91,23 @@ if ( $spmode ) {
 <div id="wrapper">
 <header>
 
-<?php if ($this->layout()->usertype != null) { 
-        echo '<div style="float:right;color:blue;margin-top:0px;">';
+<?php 
 
-        $username = "こんにちは、<B>".$this->layout()->username."</B>　様　";
-        echo $username;
+if ($this->layout()->usertype != null) {
+    echo '<div style="float:right;color:blue;margin-top:0px;">';
 
-        echo '</div>';
+    $username = "こんにちは、<B>".$this->layout()->username."</B>　様　";
+    echo $username;
 
+    echo '</div>';
+
+    if ($this->layout()->usertype == "9") {
+        echo '<div id="user-manager" >User管理</div>';
+    } else {
         echo '<div id="csv-download" >CSV管理</div>';
-} ?>
+    }
+}
+?>
 
 <a href="/" title="グーグルサジェスト キーワード一括ダウンロードツール"></a>
 
@@ -242,6 +253,11 @@ $(function(){
 
 	$("#csv-download").click(function(e){
 		window.location.href = "/keyword/csv";
+		e.stopPropagation();
+	});
+
+	$("#user-manager").click(function(e){
+		window.location.href = "/user";
 		e.stopPropagation();
 	});
 });

@@ -55,25 +55,32 @@ Class Com_Util
 	 * @param unknown $uri
 	 * @return NULL
 	 */
-	public static function sendAPIRequest($client)
+	public static function sendAPIRequest($client, $site = 0)
 	{
 	    try{
 	        $response = $client->request();
 	         
 	        if ($response->isSuccessful()) {
+	            
 	            return $response->getBody();
 	        } else {
                     	             
 	            if ($response->getStatus() == 403) {
-                    Keyword_Model_Log::registApiErrorLog($response->getMessage(), Com_Const::FORBIDDEN, $response->getStatus(), $client->getUri(true));
+	                
+                    Com_Log::registApiErrorLog($response->getMessage(), Com_Const::FORBIDDEN, $response->getStatus(), $client->getUri(true), $site);
                     return Com_Const::FORBIDDEN;
+                    
+	            } elseif ($response->getStatus() == 400) {
+                    return Com_Const::EAPPIDERR;
 	            }
-	            Keyword_Model_Log::registApiErrorLog($response->getMessage(), "sendAPIRequest: try", $response->getStatus(), $client->getUri(true));
+	            
+	            // some error
+	            Com_Log::registApiErrorLog($response->getMessage(), "sendAPIRequest: try", $response->getStatus(), $client->getUri(true), $site);
 	        }
 	         
 	    } catch (Zend_Http_Client_Exception $e) {
 	        //echo '<p>エラーが発生しました (' .$e->getMessage(). ')</p>';
-	        Keyword_Model_Log::registErrorLog($e->getMessage(), "sendAPIRequest:catch", null , null);
+	        Com_Log::registErrorLog($e->getMessage(), "sendAPIRequest:catch", null , null, $site);
 	    }
 	    return null;
 	}
@@ -109,5 +116,45 @@ Class Com_Util
 	        $mrc = curl_multi_exec($mh, $active);
 	        usleep (250000);
 	    } while ($active > 0);
+	}
+	
+	static function write($filename, $content){
+	
+	    try{
+	        $fp = fopen("log/".$filename, 'w');
+	
+	        if ($fp){
+	            if (flock($fp, LOCK_EX)){
+	                if (fwrite($fp,  $content) === FALSE){
+	                    new Exception('ファイル書き込みに失敗しました');
+	                }
+	                flock($fp, LOCK_UN);
+	            }
+	        }
+	        fclose($fp);
+	    }catch(Exception $e){
+	        new Exception($e->getMessage());
+	    }
+	}
+	
+	
+	static function read($file_name){
+	
+	    $file_name = "log/".$file_name;
+	    $text = null;
+	    if(is_file($file_name)){
+	        $fp = fopen($file_name,'r');
+	        for($line = 1; !feof($fp); $line++){
+	            $lines = fgets($fp);
+	            if($lines){
+	                $text .= $lines;
+	            }
+	        }
+	        fclose($fp);
+	    }else{
+	        print 'ファイルがありません';
+	        exit;
+	    }
+	    return $text;
 	}
 }
