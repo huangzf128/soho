@@ -16,6 +16,7 @@ class Keyword_Model_Entities_ExpandResult extends Db_Abstract
 		$expand->updatedt = $info['updatedt'];
 		$expand->status = $info['status'];
 		$expand->site = $info['site'];
+		$expand->interruptinfo = $info['interruptinfo'];
 		
 		try	{
 		    $expand->save();

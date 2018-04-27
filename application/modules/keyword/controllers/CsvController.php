@@ -26,7 +26,6 @@ class Keyword_CsvController extends Zend_Controller_Action
 
     public function csvFileOrderAction()
     {
-        
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
     
@@ -53,6 +52,84 @@ class Keyword_CsvController extends Zend_Controller_Action
         echo $result ? "1" : "0";
     }
     
+    public function expandInterruptedResultAjaxAction() {
+        
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        
+        // check
+        $historyid = $this->getRequest()->historyid;
+        $this->userid = $this->getRequest()->userid;
+        $rand = $this->getRequest()->rand;
+        
+        if (empty($this->userid) || empty($historyid)) {
+            return;
+        }
+        
+        set_time_limit(0);
+        $csvModel = new Keyword_Model_Csv();
+        $row = $csvModel->getExpandResult($historyid);
+        
+        $interruptinfo = array(0,0,0);
+        if ($row) {
+            $interruptinfo = explode("-", $row["interruptinfo"]);
+        }
+        
+        if ($interruptinfo[2] === $rand) {
+            $startTime = time(true);
+            
+            $callApiTimes = $rand % 1000;
+            $csvModel->setCallApiTimes($callApiTimes);
+            
+            if ($callApiTimes > 490) {
+                
+                $newRand = $this->getRandNum(1);
+                $interruptinfo = $interruptinfo[0]."-".$interruptinfo[1]."-".$newRand;
+                $csvModel->updateExpandRand($historyid, $interruptinfo);
+                
+                sleep(Com_Const::CSV_EXPAND_PER_WAITTIME);
+                Com_Log::registExpandLog($callApiTimes, "Sleep", "historyid: ".$historyid, null, Com_Const::GOOGLE);
+                
+                if (Com_Util::isHttps()) {
+                    $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$newRand);
+                } else {
+                    $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$newRand);
+                }
+                Com_Util::sendMulitRequest($url_list, 2);
+                return;
+            }
+            
+            try {
+                do {
+                    Com_Log::registExpandLog($interruptinfo[0]."--".$interruptinfo[1], "Interrupted", "historyid: ".$historyid, $rand, Com_Const::GOOGLE);
+                    
+                    $expandRst = $this->createExpandCsv($historyid, $startTime, $csvModel);
+                    if (is_int($expandRst)) {
+                        // 中断
+                        if (Com_Util::isHttps()) {
+                            $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
+                        } else {
+                            $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
+                        }
+                        Com_Util::sendMulitRequest($url_list, 2);
+                        break;
+                    } elseif ($expandRst == false) {
+                        break;
+                    }
+                    
+                    $historyid = $this->getNextHistoryid($this->userid);
+                    if (!empty($historyid)) {
+                        $rst = $csvModel->registExpand($historyid);
+                        $interruptinfo = array(0, "", 0);
+                    }
+                } while(!empty($historyid));
+                
+            } catch(Exception $e) {
+                Com_Log::registErrorLog($e->getMessage(), "expandResultAjaxAction: catch ", "historyid: ".$historyid, null, Com_Const::GOOGLE);
+            }
+        }
+    }
+        
     // CSV 展開する
     public function expandResultAjaxAction() {
         
@@ -71,19 +148,27 @@ class Keyword_CsvController extends Zend_Controller_Action
         $hasExecuting = $csvModel->hasExecutingCsv($this->userid);
         
         set_time_limit(0);
-//         register_shutdown_function(function(){
-//             Keyword_CsvController::shutdownFunction();
-//         });
         
         if ($hasExecuting === false) {
             try {
+                $startTime = time(true);
+                $csvModel->setCallApiTimes(1);
                 do {
                     $rst = $csvModel->registExpand($historyid);
                     if ($rst) {
-                        $expandRst = $this->createExpandCsv($historyid);
-                        if ($expandRst == false) {
+                        $expandRst = $this->createExpandCsv($historyid, $startTime, $csvModel);
+                        if (is_int($expandRst)) {
+                            // 中断
+                            if (Com_Util::isHttps()) {
+                                $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
+                            } else {
+                                $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
+                            }
+                            Com_Util::sendMulitRequest($url_list, 2);
                             break;
-                        }
+                        } elseif ($expandRst == false) {
+                            break;
+                        } 
                     }
                     $historyid = $this->getNextHistoryid($this->userid);
                 } while(!empty($historyid));
@@ -119,33 +204,63 @@ class Keyword_CsvController extends Zend_Controller_Action
      *  private
      *------------------------------------------------------------------------*/
     
-    private function createExpandCsv($historyid) {
+    private function getRandNum($calApiTimes) {
+        $rand = rand(1000, 9999);
+        $rand = $rand * 1000 + $calApiTimes;
+        return $rand;
+    }
     
-        $csvModel = new Keyword_Model_Csv();
+    private function isNeedExpand($expandRst, $level) {
+        if (empty($expandRst["level".$level])) {
+            return true;
+        }
         
+        $interruptinfo = explode("-", $expandRst["interruptinfo"]);
+        if ($level < $interruptinfo[0]) {
+            return false;
+        }
+        return true;
+    }
+    
+    private function createExpandCsv($historyid, $startTime, $csvModel) {
+    
         try {
             // get history
             $expandRst = $csvModel->getExpandResult($historyid);
             $expandKeywords = $expandRst["result"];
+            $interruptinfo = explode("-", $expandRst["interruptinfo"]);
             
             // expand Search
             for ($i = 0; $i < Com_Const::CSV_EXPAND_LEVEL_MAX; $i++) {
                 
-                Com_Log::registExpandLog("start: level".($i + 1), $historyid, null, null, Com_Const::GOOGLE);
                 
-                if (empty($expandRst["level". ($i + 1)])) {
-                    $expandKeywords = $csvModel->expandLevel($expandKeywords);
+                if ($this->isNeedExpand($expandRst, $i + 1)) {
+                    
+                    if (empty($interruptinfo[1])) {
+                        Com_Log::registExpandLog("start: level".($i + 1), $historyid, null, null, Com_Const::GOOGLE);
+                    }
+                    
+                    $expandKeywords = $csvModel->expandLevel($expandKeywords, $startTime, 
+                                                                $expandRst["level".($i + 1)], $interruptinfo[1]);
                     
                     if ($expandKeywords == Com_Const::FORBIDDEN) {
 
                         $csvModel->updateExpandStatus($historyid, Com_Const::STATUS_FORBIDDEN);
                         return false;
                     } elseif ($expandKeywords == Com_Const::ERROR) {
-                    
+                        
                         $csvModel->updateExpandStatus($historyid, Com_Const::STATUS_ERROR);
-                        return false;                        
-                    } else {
-                        $csvModel->updateExpandLevel($historyid, $expandKeywords, $i + 1);
+                        return false;
+                    } elseif (is_array($expandKeywords) && $expandKeywords[0] == Com_Const::INTERRUPTION) {
+                        $rand = $this->getRandNum($expandKeywords[3]);
+                        
+                        $csvModel->updateExpandLevel($historyid, $expandKeywords[1], $i + 1, 
+                                                        ($i + 1)."-".$expandKeywords[2]."-".$rand);
+                        return $rand;
+                    }
+                    else {
+                        $csvModel->updateExpandLevel($historyid, $expandKeywords, $i + 1, ($i + 2)."--0");
+                        $interruptinfo[1] = "";
                     }
                 } else {
                     $expandKeywords = $expandRst["level".($i + 1)];

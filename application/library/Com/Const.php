@@ -25,7 +25,7 @@ Class Com_Const
 	const FORBIDDEN = "Forbidden";
 	const EAPPIDERR = "eappiderr";
 	const ERROR = "error";
-	
+	const INTERRUPTION = "interruption";
 	
 	// CSV取得状況
 	const STATUS_ING = 0;
@@ -43,5 +43,9 @@ Class Com_Const
     const BING = 3;
     const YAHOO = 4;
     const YOUTUBE = 5;
+    
+    // 実行タイム(秒)
+    const EXECUTE_TIME_G = 300;
+    const EXECUTE_TIME = 50;
     
 }

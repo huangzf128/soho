@@ -63,7 +63,7 @@ class Keyword_Model_Entities_CsvOrderUser extends Db_Abstract
 	public function getExecutingCsv($userid, $site) {
 	    $result = $this->fetchAll(
     	            $this->select()->setIntegrityCheck(FALSE)
-    	            ->from(array("c"=>"csvorderuser"), array("historyid"))
+    	            ->from(array("c"=>"csvorderuser"), array("c.historyid"))
     	            ->joinLeft(array("e"=>"expandresult"),
     	                    "c.historyid = e.historyid and c.site = e.site",
     	                    array())

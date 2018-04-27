@@ -17,7 +17,7 @@ input[name=password] { width:80px; }
     <td width="20%">ユーザー名(必須)</td>
     <td width="24%">メール</td>
     <td width="16%">パスワード(必須)</td>
-    <td width="28%"> &nbsp;g&nbsp;&nbsp; a&nbsp;&nbsp; b&nbsp;&nbsp; ヤ&nbsp; yt</td>
+    <td width="28%"> &nbsp;G&nbsp;&nbsp; Y&nbsp;&nbsp; B&nbsp;&nbsp; A&nbsp; T</td>
 </tr>
 <tr>
     <td><input type="text" id="id" name="id" value="<?php echo $this->id; ?>"/></td>
@@ -27,9 +27,9 @@ input[name=password] { width:80px; }
     
     <td>
 		<input type="checkbox" name="site[]" id="g" value="1"/>
-		<input type="checkbox" name="site[]" id="a" value="2"/>
-		<input type="checkbox" name="site[]" id="b" value="3"/>
 		<input type="checkbox" name="site[]" id="ya" value="4"/>
+		<input type="checkbox" name="site[]" id="b" value="3"/>
+		<input type="checkbox" name="site[]" id="a" value="2"/>
 		<input type="checkbox" name="site[]" id="yt" value="5"/> 
     	<input type="submit" id="regist" value="登録"/>
     </td>
@@ -47,7 +47,7 @@ input[name=password] { width:80px; }
     <td width="20%">ユーザー名(必須)</td>
     <td width="24%">メール</td>
     <td width="16%">パスワード(必須)</td>
-    <td width="28%"> &nbsp;g&nbsp;&nbsp; a&nbsp;&nbsp; b&nbsp;&nbsp; ヤ&nbsp; yt</td>
+    <td width="28%"> &nbsp;G&nbsp;&nbsp; Y&nbsp;&nbsp; B&nbsp;&nbsp; A&nbsp; T</td>
 </tr>
 
 <?php 
@@ -71,12 +71,12 @@ if ($this->users) {
         	       '<td><input type="text" name="password" value="'.$password.'"/></td>'.
         	       '<td>
             		<input type="checkbox" name="site[]"  id="g"  value=1 '.(strpos($site, "1") !== false ? "checked": "").'/>
-            		<input type="checkbox" name="site[]"  id="a"  value=2 '.(strpos($site, "2") !== false ? "checked": "").'/>
-            		<input type="checkbox" name="site[]"  id="b"  value=3 '.(strpos($site, "3") !== false ? "checked": "").'/>
             		<input type="checkbox" name="site[]" id="ya" value=4 '.(strpos($site, "4") !== false ? "checked": "").'/>
+            		<input type="checkbox" name="site[]"  id="b"  value=3 '.(strpos($site, "3") !== false ? "checked": "").'/>
+            		<input type="checkbox" name="site[]"  id="a"  value=2 '.(strpos($site, "2") !== false ? "checked": "").'/>
             		<input type="checkbox" name="site[]" id="yt" value=5 '.(strpos($site, "5") !== false ? "checked": "").'/> 
                         <button name="updbtn" uid='.$id.' >更新</button> <span style="color:red;"></span>&nbsp;&nbsp;
-                        <button name="delbtn" style="display:none;" uid='.$id.' >削除</button></td>'.
+                        <button name="delbtn" '. ($row["type"] == 9 ? 'style="display:none;"' : "").' uid='.$id.' >削除</button></td>'.
                 '</tr>';
     };    
 }

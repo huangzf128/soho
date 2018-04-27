@@ -1,6 +1,7 @@
 <?php
 class Keyword_Model_Csv extends Db_Abstract{
     
+    private $callApiTimes;
     function __construct() { }
     
     // 予約登録
@@ -58,19 +59,21 @@ class Keyword_Model_Csv extends Db_Abstract{
         $data["updatedt"] = date('Y-m-d H:i:s');
         $data["status"] = 0;
         $data["site"] = Com_Const::GOOGLE;
+        $data["interruptinfo"] = "0--0";
         
         $rst = $expandDao->regist($data);
         
     	return $rst;
 	}
 	
-	public function updateExpandLevel($historyid, $expandKeywords, $level)
+	public function updateExpandLevel($historyid, $expandKeywords, $level, $interruptinfo)
 	{
 	    $dao = new Keyword_Model_Entities_ExpandResult();
 	    
 	    $data = array();
 	    $data["level".$level] = $expandKeywords;
 	    $data["updatedt"] = date('Y-m-d H:i:s');
+	    $data["interruptinfo"] = $interruptinfo;
 	    
 	    $where = array();
 	    $where["historyid = ?"] = $historyid;
@@ -78,6 +81,21 @@ class Keyword_Model_Csv extends Db_Abstract{
 	    
 	    $rst = $dao->updateExpand($data, $where);
 	    
+	    return $rst;
+	}
+	
+	public function updateExpandRand($historyid, $interruptinfo) {
+	    $dao = new Keyword_Model_Entities_ExpandResult();
+	    
+	    $data = array();
+	    $data["updatedt"] = date('Y-m-d H:i:s');
+	    $data["interruptinfo"] = $interruptinfo;
+	    
+	    $where = array();
+	    $where["historyid = ?"] = $historyid;
+	    $where["site = ?"] = Com_Const::GOOGLE;
+	    
+	    $rst = $dao->updateExpand($data, $where);
 	    return $rst;
 	}
 	
@@ -107,10 +125,9 @@ class Keyword_Model_Csv extends Db_Abstract{
 	 * 検索結果を展開する
 	 * @param unknown $sk
 	 */
-	public function expandLevel($skStr) {
+	public function expandLevel($skStr, $startTime, $interruptRst, $interruptGrpNm) {
 	    // parse
-	    $skAry = $this->parseSkStrToAry($skStr);
-	    
+	    $skAry = $this->parseSkStrToAry($skStr, $interruptGrpNm);
 	    // expand
 	    $client = new Zend_Http_Client();
 	    $client->setConfig(array(
@@ -119,9 +136,7 @@ class Keyword_Model_Csv extends Db_Abstract{
 	            'curloptions' => array(CURLOPT_FOLLOWLOCATION => false),
 	    ));
 	    
-	    $expandKeywords = "";
-	    $groupNmBk = "";
-	    $i = 1;
+	    $expandKeywords = $interruptRst;
 	    foreach ($skAry as $groupNm => $keyword) {
 	        
 	        if ($keyword == null || trim($keyword) == "") {
@@ -144,11 +159,12 @@ class Keyword_Model_Csv extends Db_Abstract{
 	                $expandKeywords .= $rstWord;
 	            }
 	        }
-	        if ( ($i++ % 500) == 0) {
-	            sleep(Com_Const::CSV_EXPAND_PER_WAITTIME);
+	        
+	        if (time(true) - $startTime > Com_Const::EXECUTE_TIME_G 
+	            || $this->callApiTimes++ > 500) {
+	            return array(Com_Const::INTERRUPTION, $expandKeywords, $groupNm, $this->callApiTimes);
 	        }
 	    }
-	    
 	    return $expandKeywords;
 	}
 	
@@ -159,11 +175,11 @@ class Keyword_Model_Csv extends Db_Abstract{
 	public function makeCsv($expand) {
 	    $csvdata = "";
 	    
-	    $skAry = $this->parseSkStrToAry($expand["result"]);
+	    $skAry = $this->parseSkStrToAry($expand["result"], "");
 	    
-	    $level1Ary = !empty($expand["level1"]) ? $this->parseSkStrToAry($expand["level1"]) : null;
-	    $level2Ary = !empty($expand["level2"]) ? $this->parseSkStrToAry($expand["level2"]) : null;
-	    $level3Ary = !empty($expand["level3"]) ? $this->parseSkStrToAry($expand["level3"]) : null;
+	    $level1Ary = !empty($expand["level1"]) ? $this->parseSkStrToAry($expand["level1"], "") : null;
+	    $level2Ary = !empty($expand["level2"]) ? $this->parseSkStrToAry($expand["level2"], "") : null;
+	    $level3Ary = !empty($expand["level3"]) ? $this->parseSkStrToAry($expand["level3"], "") : null;
 	    
 	    $file = fopen('php://output', 'w');
 	    
@@ -216,7 +232,6 @@ class Keyword_Model_Csv extends Db_Abstract{
 	    }
 	}
 	
-	
 	// --------------------------------------------------------------
 	// Private Function
 	// --------------------------------------------------------------
@@ -248,19 +263,27 @@ class Keyword_Model_Csv extends Db_Abstract{
 	    return $skStr;
 	}
 	
-	private function parseSkStrToAry($skStr) {
+	private function parseSkStrToAry($skStr, $grpNm) {
 	     
 	    $skAry = array();
 	    $groupAry = explode("<", ltrim($skStr, "<"));
-	     
+	    
+	    $isNeedProcess = empty($grpNm);
 	    foreach($groupAry as $group) {
 	        $g = explode(">", $group);
 	        $k = explode("&", $g[1]);
 	        for ($i = 0; $i < count($k); $i++) {
+	            
+	            if ($g[0].$i == $grpNm) {
+	                $isNeedProcess = true;
+	                continue;
+	            }
+	            if (!$isNeedProcess) {
+	                continue;
+	            }
 	            $skAry[$g[0].$i] = $k[$i];
 	        }
 	    }
-	
 	    return $skAry;
 	}
 	
@@ -289,5 +312,12 @@ class Keyword_Model_Csv extends Db_Abstract{
 	    return rtrim($expandKeywords,"&");
 	}
 	
+	// -------------------------------------------------
 	
+	public function setCallApiTimes($time) {
+	    $this->callApiTimes = $time;
+	}
+	public function getCallApiTimes() {
+	    return $this->callApiTimes;
+	}
 }

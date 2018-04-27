@@ -1,1 +1,6 @@
 history/
+.settings/
+.project
+.buildpath
+.zfproject.xml
+*.DS_Store
