@@ -1,8 +1,9 @@
 <table id="historytab" align="center">
 <tr>
-    <td width="50%">キーワード</d>
+    <td width="45%">キーワード</d>
     <td width="25%">予約日付</td>
-    <td width="25%"> </td>
+    <td width="15%">取得状況</td>
+    <td width="15%">操作</td>
 </tr>
 
 <?php 
@@ -14,17 +15,30 @@ if ($this->orders) {
         $status = $row["status"];
         
         echo   '<tr>'.
-        	       '<td><a href="/history/archive/'.$time.'_'.$keyword.'">'.$keyword.'</a><span style="display:none;">'.
-                        $row['historyid'].'</span><span style="display:none;">'.$time.'</span></td>'.
+        	       '<td><a href="/history/archive/'.$time.'_'.$keyword.'">'.$keyword.'</a>'.
+        	           '<span style="display:none;">'.$row['historyid'].':'.$time.'</span>'.
+                   '</td>'.
         	       '<td>'.$row["updatedt"].'</td>';
         
         if ($status == null) {
             echo '<td>処理待ち</td>';
+            echo '<td>&nbsp;</td>';
         } else if ($status == 0) {
             echo '<td>処理中</td>';
+            $now = new DateTime;
+            $lastupdatedt = new DateTime($row["lastupdatedt"]);
+            $diff_min = ($now->format("U") - $lastupdatedt->format("U")) / 60;
+            echo '<td>'.($diff_min > 3 ? "<a href='/keyword/csv/delete?id=".$row["historyid"]."'>削除</a>": "").'</td>';
         } else if ($status == 1) {
             echo
             '<td><a href="/keyword/csv/download?id='.$row["historyid"].'" >Download</a></td>';
+            echo '<td>&nbsp;</td>';
+        } else {
+            echo '<td>エラー</td>';
+            $now = new DateTime;
+            $lastupdatedt = new DateTime($row["lastupdatedt"]);
+            $diff_min = ($now->format("U") - $lastupdatedt->format("U")) / 60;
+            echo '<td>'.($diff_min > 3 ? "<a href='/keyword/csv/delete?id=".$row["historyid"]."'>削除</a>": "").'</td>';
         }
         
         echo '</tr>';

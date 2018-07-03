@@ -48,11 +48,13 @@ class Keyword_Model_Entities_CsvOrderUser extends Db_Abstract
 	            ->joinLeft(array("h"=>"searchhistory"),
 	                    "c.historyid = h.id",
 	                    array("registdt"=>"h.registdt", "kword"=>"h.kword"))
+	            
 	            ->joinLeft(array("e"=>"expandresult"),
 	                    "c.historyid = e.historyid and c.site = e.site",
-	                    array("status"=>"e.status"))
-               ->where("userid = ?", $usreid)->where("c.site = ? ", $site)
-               ->order('updatedt DESC'));
+	                    array("status"=>"e.status", "lastupdatedt"=>"e.updatedt"))
+	            
+               ->where("c.userid = ?", $usreid)->where("c.site = ? ", $site)
+               ->order('c.updatedt DESC'));
 	    
 	    if (!empty($result)) {
 	        return $result;
@@ -66,7 +68,7 @@ class Keyword_Model_Entities_CsvOrderUser extends Db_Abstract
     	            ->from(array("c"=>"csvorderuser"), array("c.historyid"))
     	            ->joinLeft(array("e"=>"expandresult"),
     	                    "c.historyid = e.historyid and c.site = e.site",
-    	                    array())
+    	                    array(""))
     	            ->where("e.status = 0  and c.userid = ? ", $userid)->where("c.site = ? ", $site)
 	            );
 	    
@@ -91,5 +93,18 @@ class Keyword_Model_Entities_CsvOrderUser extends Db_Abstract
 	        return $result;
 	    }
 	    return false;
+	}
+	
+	/**
+	 * ゲットレコード
+	 * @param unknown $historyid
+	 * @return unknown|boolean
+	 */
+	public function deleteOne($historyid, $userid, $site)
+	{
+	    $this->delete(array("historyid = ? " => $historyid, 
+	                           "site = ? " => $site, 
+	                           "userid = ? " => $userid));
+	    return true;
 	}
 }

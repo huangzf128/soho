@@ -31,6 +31,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
     	
         $keyword = mb_convert_encoding($this->getRequest()->keyword, "utf-8","auto");
         $model = new Keyword_Model_SuggestKeyword($keyword);
+        set_time_limit(60);
         
         if(!$this->accessLimitCheck()){
         	$this->_helper->layout->assign('keyword', $keyword);
@@ -66,11 +67,22 @@ class Keyword_KeywordController extends Zend_Controller_Action
         	return;
 		}
 		
+		$this->_helper->layout->setLayout('historyd');
+		$layout = $this->_helper->layout->getLayoutInstance();
+		
+		// recent keyword
+		$recentRst = $model->getRecentKeyword();
+		if ($recentRst) {
+		    $layout->assign('keyword', $recentRst["kword"]);
+		    $layout->assign('rstCnt', $recentRst["rstcnt"]);
+		    $this->view->sk = $recentRst["sk"];  // 検索結果
+		    $this->view->indextab = $recentRst["indextab"];      // 索引
+		    
+		    return;
+		}
+		
 		// 検索
-		$model->getSuggestKeyword();
-                        
-        $this->_helper->layout->setLayout('historyd');
-        $layout = $this->_helper->layout->getLayoutInstance();
+		$result = $model->getSuggestKeyword();
         
         $layout->assign('keyword', $keyword);
         $layout->assign('rstCnt', $model->getRstCnt());
@@ -79,7 +91,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
         
         $registFlg = $this->getRequest()->registflg;
         //検索情報をDB登録
-        if(isset($registFlg) && $registFlg == 1){
+        if(isset($registFlg) && $registFlg == 1 && $result){
             
         	$model->setRegistdt(date('Y-m-d H:i:s'));
         	$this->view->historyid = $model->registSearchHistoryResult();
@@ -158,34 +170,47 @@ class Keyword_KeywordController extends Zend_Controller_Action
         $registdt = substr($fileName, 0, strrpos($fileName, '_'));
         $keyword = substr($fileName, strrpos($fileName, '_') + 1);
         
-        $file = $model->getResultFile($fileName);
+        $result = false;
+        if(isset($registdt)) {
+            $result = $this->getSearchHistoryDetailAction($registdt, $keyword);
+        }
         
-        // 存在チェック
-        if($file === false) {
-            
-            $result = false;
-            
-            if(isset($registdt)) {
-                $result = $this->getSearchHistoryDetailAction($registdt, $keyword);
-            }
-            
-            if (!$result) {
-                // データ存在しない
-                $this->_helper->assign('content', $this->view->render("error/error.phtml"));
-            }
-            
+        if (!$result) {
+            // データ存在しない
+            $this->_helper->assign('content', $this->view->render("error/error.phtml"));
         } else {
-
-            $this->_helper->layout->disableLayout();
-            $this->_helper->viewRenderer->setNoRender(true);
             
-            // 既存の履歴は、表示・非表示でIPCSVを制御する            
-            $script = "";
-            if($model->isValidIp()) {
-                $script = "<script>$('.csvprime').show();</script>";
-            }            
-            	echo $file.$script;
-        }        
+            $file = $model->getResultFile($fileName);
+            
+            // 存在チェック
+            if($file === false) {
+            
+                $this->_helper->layout->setLayout('historyd');
+                $layout = $this->_helper->layout->getLayoutInstance();
+            
+                $layout->assign('keyword', $result['kword']);
+                $layout->assign('rstCnt', $result['rstcnt']);
+                $this->view->sk = $result['sk'];
+                $this->view->indextab = $result['indextab'];
+                $this->view->historyid = $result['id'];
+            
+                // change phtml name
+                $this->_helper->viewRenderer->setRender('get-suggest-keyword');
+                return true;
+            
+            } else {
+            
+                $this->_helper->layout->disableLayout();
+                $this->_helper->viewRenderer->setNoRender(true);
+            
+                // 既存の履歴は、表示・非表示でIPCSVを制御する
+                $script = "";
+                if($model->isValidIp()) {
+                    $script = "<script>$('.csvprime').show();</script>";
+                }
+                echo $file.$script;
+            }
+        }
     }
     
     /*------------------------------------------------------------------------
@@ -200,24 +225,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
         //$id = $this->getRequest()->id;
     
         $model = new Keyword_Model_SuggestKeyword(null);
-        $result = $model->getSearchHistoryDetail($registdt, $keyword);
-
-        if ($result) {
-            
-            $this->_helper->layout->setLayout('historyd');
-            $layout = $this->_helper->layout->getLayoutInstance();
-            
-            $layout->assign('keyword', $result['kword']);
-            $layout->assign('rstCnt', $result['rstcnt']);
-            $this->view->sk = $result['sk'];
-            $this->view->indextab = $result['indextab'];
-            $this->view->historyid = $result['id'];
-            
-            // change phtml name
-            $this->_helper->viewRenderer->setRender('get-suggest-keyword');
-            return true;
-        }
-        return false;
+        return $model->getSearchHistoryDetail($registdt, $keyword);
     }
     
     static function errOutput($errSql_file, $sql){

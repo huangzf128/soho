@@ -96,37 +96,55 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         		'curloptions' => array(CURLOPT_FOLLOWLOCATION => false),
         ));
         
+        $f_info = Com_Util::readLock("suggest_lock");
         $errorFlg = false;
         $cnt = count($this->suggestAry);
-        for($i = 0; $i < $cnt; $i++)
-        {
-            if ($this->suggestAry[$i] == ""){
-                $newKeyword = $this->keyword;
-            } else {
-            	$newKeyword = $this->keyword." ".$this->suggestAry[$i];
-           	}
-       		$client->setUri("http://www.google.co.jp/complete/search?hl=en&q=".urlencode($newKeyword)."&output=toolbar");
+        
+        try {
             
-            //send request
-            $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE);
-            if ($response !== null) {
-            	$this->parseXMLResponse($response, $newKeyword, $i);
-            	
-            } else {
-                // error, 403 forbidden
-//             	$this->makeIndex($i, false);
-            	$errorFlg = true;
-            	break;
+            for($i = 0; $i < $cnt; $i++)
+            {
+                if ($this->suggestAry[$i] == ""){
+                    $newKeyword = $this->keyword;
+                } else {
+                    $newKeyword = $this->keyword." ".$this->suggestAry[$i];
+                }
+                $client->setUri(Com_Const::API_GOOGLE.urlencode($newKeyword));
+            
+                //send request
+                $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE);
+                if ($response == Com_Const::FORBIDDEN || $response == null) {
+                    // error, 403 forbidden
+                    $errorFlg = true;
+                    break;
+                } else {
+                    $this->parseXMLResponse($response, $newKeyword, $i);
+                }
             }
-        }        
-    	//index
-    	$this->indexTab .= "</tr></table>";
+            //index
+            $this->indexTab .= "</tr></table>";
+            
+        } catch(Exception $e) {
+        }
+    	
+    	Com_Util::releaseLock($f_info[0], null);
     	
     	if($errorFlg){
     		$this->strSuggestKeywords = "<font color='red'>サーバーが混雑しているため、しばらく経ってからご利用ください。</font><br/><br/>※以下の姉妹サイトもお試しください。<br /><a href=\"http://www.yakw.net/\"target=\"_blank\">ヤフーサジェスト キーワード一括ＤＬツール</a><br /><a href=\"http://www.bskw.net/\" target=\"_blank\">ビングサジェストキーワード一括ＤＬツール</a><br /><a href=\"http://www.azkw.net/\" target=\"_blank\">アマゾンサジェストキーワード一括ＤＬツール</a><br /><a href=\"http://www.ytkw.net/\" target=\"_blank\">ユーチューブサジェストキーワード一括ＤＬツール</a><br/><br/>";
+    		return false;
     	}
+    	return true;
     }
     
+    public function getRecentKeyword() {
+        $dao = new Keyword_Model_Entities_SearchHistory();
+        $rows = $dao->getRecentKeyword($this->keyword);
+        
+        if (count($rows) > 0) {
+            return $rows[0];
+        }
+        return false;
+    }
     
     /**
      * 検索結果をDBに登録する

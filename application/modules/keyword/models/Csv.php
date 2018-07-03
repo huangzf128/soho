@@ -105,6 +105,14 @@ class Keyword_Model_Csv extends Db_Abstract{
 	    return $row;
 	}
 	
+	public function deleteOrderCsv($historyid, $userid) {
+	    $dao = new Keyword_Model_Entities_CsvOrderUser();
+        $dao->deleteOne($historyid, $userid, Com_Const::GOOGLE);
+        
+        $dao = new Keyword_Model_Entities_ExpandResult();
+        $dao->deleteOne($historyid, Com_Const::GOOGLE);
+	}
+	
 	public function updateExpandStatus($historyid, $status)
 	{
 	    $dao = new Keyword_Model_Entities_ExpandResult();
@@ -136,34 +144,93 @@ class Keyword_Model_Csv extends Db_Abstract{
 	            'curloptions' => array(CURLOPT_FOLLOWLOCATION => false),
 	    ));
 	    
+	    $api = Com_Const::CSV_SERVER_GOOGLE;
+	    
 	    $expandKeywords = $interruptRst;
+	    
+	    $i = 1;
+	    $count = count($skAry);
+	    $keyRes = array();
 	    foreach ($skAry as $groupNm => $keyword) {
 	        
 	        if ($keyword == null || trim($keyword) == "") {
                 continue;
 	        }
 	        
-	        $client->setUri("http://www.google.co.jp/complete/search?hl=en&q=".urlencode($keyword)."&output=toolbar");
-	        $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE);
-
-	        if ($response == Com_Const::FORBIDDEN) {
-	            
-	            return Com_Const::FORBIDDEN;
-            } elseif ($response == null) {
-                // some error
-                return Com_Const::ERROR;	            
-	        } else {
-	            $rstWord = $this->parseXMLResponseCsv($response, $groupNm, $keyword);
-	            
-	            if (!empty($rstWord)) {
-	                $expandKeywords .= $rstWord;
-	            }
+	        $keyRes[$groupNm] = $keyword;
+	        if (count($keyRes) < 40 && $i++ < $count) {
+	            continue;
 	        }
 	        
+	        
+	        $fp = fopen("log/csvlock", 'a+');
+	        while (!flock ($fp, LOCK_EX)) {
+	            usleep(1000);
+	        }
+	        
+            $client->setUri($api);
+            $client->setParameterPost('site', Com_Const::GOOGLE);
+            $client->setParameterPost('keyword', urlencode(json_encode($keyRes)));
+            
+            $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE, "POST");
+	         
+	        usleep(500 * 1000);
+	        $this->callApiTimes++;
+	         
+            try {
+                flock($fp, LOCK_UN);
+                fclose($fp);
+            } catch(Exception $e) {
+                fclose($fp);
+            }
+	        
+            usleep(500 * 1000);
+	        
+	        if (!$response || in_array($response, array(Com_Const::FORBIDDEN, Com_Const::SERVICEUNAVAILABLE, Com_Const::EAPPIDERR)) ) {
+	            
+	        	$otherServerRes = Com_Util::getFromReplaceServer($client, Com_Const::GOOGLE);
+	            if ($otherServerRes == false) {
+	                
+	                Com_Log::registApiErrorLog("game", "over", "0件", mb_convert_encoding($keyword, "shift-jis"), Com_Const::GOOGLE);
+	                
+	                return Com_Const::FORBIDDEN;
+	            } else {
+	                // success
+	                $response = $otherServerRes[0];
+	                $api = $otherServerRes[1];
+	            }
+            } 
+            
+            
+            $response = json_decode($response);
+
+            
+            $ri = 0;
+            foreach ($keyRes as $gNm => $kword) {
+                
+                if (is_array($response) == false || $response == null) {
+                    
+                    Com_Log::registApiErrorLog("some error", "over", $api, $keyword, Com_Const::GOOGLE);
+                    // some error
+                    // return Com_Const::ERROR;
+                } else {
+                    $rstWord = $this->parseXMLResponseCsv($response[$ri++], $gNm, $kword);
+                     
+                    if (!empty($rstWord)) {
+                        $expandKeywords .= $rstWord;
+                    }
+                }
+            }
+	        
+            //Com_Log::registApiErrorLog("time", "time", time(true), $startTime, Com_Const::GOOGLE);
+            
 	        if (time(true) - $startTime > Com_Const::EXECUTE_TIME_G 
 	            || $this->callApiTimes++ > 500) {
+	                
 	            return array(Com_Const::INTERRUPTION, $expandKeywords, $groupNm, $this->callApiTimes);
 	        }
+	        
+	        $keyRes = array();
 	    }
 	    return $expandKeywords;
 	}
@@ -186,7 +253,7 @@ class Keyword_Model_Csv extends Db_Abstract{
 	    foreach ($skAry as $gSk => $sk) {
 	        
 	        $rst = array(substr($gSk, 0, -1), $sk);
-	        fputcsv($file, $rst);
+	        fputcsv($file, $this->encode_array($rst));
 	        
 	        // level1
 	        for ($i = 0; $i < 10; $i++) {
@@ -195,7 +262,7 @@ class Keyword_Model_Csv extends Db_Abstract{
 	                
 	                $level1Rst = $rst;
 	                $level1Rst[] = $level1Ary[$gSk.$i];
-	                fputcsv($file, $level1Rst);
+	                fputcsv($file, $this->encode_array($level1Rst));
 	                
 	                // leve2
 	                for ($j = 0; $j < 10; $j++) {
@@ -204,7 +271,7 @@ class Keyword_Model_Csv extends Db_Abstract{
 	                        
 	                        $level2Rst = $level1Rst;
 	                        $level2Rst[] = $level2Ary[$gSk.$i.$j];
-	                        fputcsv($file, $level2Rst);
+	                        fputcsv($file, $this->encode_array($level2Rst));
 	                
 	                        // leve3
 	                        for ($k = 0; $k < 10; $k++) {
@@ -213,7 +280,7 @@ class Keyword_Model_Csv extends Db_Abstract{
 	                                 
 	                                $level3Rst = $level2Rst;
 	                                $level3Rst[] = $level3Ary[$gSk.$i.$j.$k];
-	                                fputcsv($file, $level3Rst);
+	                                fputcsv($file, $this->encode_array($level3Rst));
 	                                 
 	                            } else {
 	                                break;
@@ -235,6 +302,16 @@ class Keyword_Model_Csv extends Db_Abstract{
 	// --------------------------------------------------------------
 	// Private Function
 	// --------------------------------------------------------------
+	
+	private function encode_array($ary) {
+	
+	    $nary = array();
+	    for ($i = 0; $i < count($ary); $i++) {
+	        $nary[$i] = mb_convert_encoding($ary[$i], "shift-jis", "auto");
+	    }
+	
+	    return $nary;
+	}
 	
 	// 検索結果のhtmlタグを削除する
 	private function removeSkTag($sk) {

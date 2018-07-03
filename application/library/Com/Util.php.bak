@@ -59,12 +59,12 @@ Class Com_Util
 	{
 	    try{
 	        $response = $client->request($method);
-	         
+	        
 	        if ($response->isSuccessful()) {
-	            
+	             
 	            return $response->getBody();
 	        } else {
-                    	             
+	            
 	            // some error
 	            Com_Log::registApiErrorLog($response->getMessage(), "sendAPIRequest: try", $response->getStatus(), $client->getUri(true), $site);
 	            
@@ -74,7 +74,8 @@ Class Com_Util
                     return Com_Const::FORBIDDEN;
                     
 	            } elseif ($response->getStatus() == 400) {
-                    return Com_Const::EAPPIDERR;
+
+	                return Com_Const::EAPPIDERR;
                     
 	            } elseif ($response->getStatus() == 503) {
 	                
@@ -98,12 +99,12 @@ Class Com_Util
 	{
 	    try{
 	        $response = $client->request($method);
-	
+	         
 	        if ($response->isSuccessful()) {
 	
 	            return $response->getBody();
 	        } else {
-	
+	             
 	            // some error
 	            Com_Log::registApiErrorLog($response->getMessage(), "sendAPIRequest: try", $response->getStatus(), $client->getUri(true), $site);
 	        }
@@ -160,14 +161,14 @@ Class Com_Util
 	            usleep(1000);
 	        }
 	
-	    	for($line = 1; !feof($fp); $line++) {
+	        for($line = 1; !feof($fp); $line++) {
 	            $lines = fgets($fp);
 	            if($lines) {
 	                $tmp = explode("---", $lines);
 	                $servers[$tmp[0]] = trim(preg_replace('/\s+/', ' ', $tmp[1]));
 	            }
 	        }
-	        
+	
 	        $retVal = false;
 	
 	        foreach ($servers as $key => $value) {
@@ -177,7 +178,7 @@ Class Com_Util
 	                $diff = time(true) - strtotime($value);
 	                $minutes = (int)($diff / 60);
 	            }
-	
+	            
 	            Com_Log::registApiErrorLog("test change 1", $key, $response, $servers[$key], $site);
 	             
 	            if ($value == 1 ||
@@ -190,24 +191,21 @@ Class Com_Util
 	                        $client->setUri($key);
 	                        // ★★★★★★
 	                        Com_Log::registApiErrorLog("test change 2", $key, $response, $servers[$key], $site);
-	
+	                         
 	                        $response = Com_Util::sendAPIRequestServer($client, $site, "POST");
 	                        Com_Log::registApiErrorLog("test change", $key, $response, $servers[$key], $site);
-	
-	                        if ($response == null || $response == Com_Const::FORBIDDEN  ) {
+	                         
+	                        if ($response == null || $response == Com_Const::FORBIDDEN ) {
 	                            
 	                            if ($servers[$key] == 1 && $response == Com_Const::FORBIDDEN) {
 	                                $servers[$key] = date("Y/m/d H:i:s");
 	                                Com_Log::registApiErrorLog("server down", $key, "", "server", $site);
 	                            }
-                                else {
-                                    Com_Log::registApiErrorLog("test change 3", $key, $response, $servers[$key], $site);
-                                }
+	                            
 	                            sleep(2);
 	                            continue;
 	                        } else {
 	                            $servers[$key] = 1;
-	
 	                            $retVal = array($response, $key);
 	
 	                            Com_Log::registApiErrorLog("server change", $key, $response, "", $site);
@@ -222,7 +220,7 @@ Class Com_Util
 	            $contents .= ($key."---".$value."\n");
 	        }
 	
-	        try {
+            try {
                 ftruncate($fp, 0);
                 fwrite($fp,  $contents);
                 flock($fp, LOCK_UN);
@@ -231,7 +229,7 @@ Class Com_Util
                Com_Log::registApiErrorLog("exception", $e->getMessage(), "", "", $site);
 	           return false;
             }
-	        
+	
 	        return $retVal;
 	
 	    } catch (Exception $e) {

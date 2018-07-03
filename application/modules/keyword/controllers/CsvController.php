@@ -43,7 +43,7 @@ class Keyword_CsvController extends Zend_Controller_Action
                 } else {
                     $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Result-Ajax?historyid=".$historyid."&userid=".$this->userid);
                 }
-                Com_Util::sendMulitRequest($url_list, 2);
+                Com_Util::sendMulitRequest($url_list);
             }
         } catch (Exception $e) {
             Com_Log::registErrorLog($e->getMessage(), "csvFileOrderAction", null, null, Com_Const::GOOGLE);
@@ -87,15 +87,16 @@ class Keyword_CsvController extends Zend_Controller_Action
                 $interruptinfo = $interruptinfo[0]."-".$interruptinfo[1]."-".$newRand;
                 $csvModel->updateExpandRand($historyid, $interruptinfo);
                 
-                sleep(Com_Const::CSV_EXPAND_PER_WAITTIME);
-                Com_Log::registExpandLog($callApiTimes, "Sleep", "historyid: ".$historyid, null, Com_Const::GOOGLE);
+                sleep(Com_Const::CSV_EXPAND_PER_WAITTIME_G);
+                
+                // Com_Log::registExpandLog($callApiTimes, "Sleep", "historyid: ".$historyid, null, Com_Const::GOOGLE);
                 
                 if (Com_Util::isHttps()) {
                     $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$newRand);
                 } else {
                     $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$newRand);
                 }
-                Com_Util::sendMulitRequest($url_list, 2);
+                Com_Util::sendMulitRequest($url_list);
                 return;
             }
             
@@ -111,7 +112,7 @@ class Keyword_CsvController extends Zend_Controller_Action
                         } else {
                             $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
                         }
-                        Com_Util::sendMulitRequest($url_list, 2);
+                        Com_Util::sendMulitRequest($url_list);
                         break;
                     } elseif ($expandRst == false) {
                         break;
@@ -164,7 +165,7 @@ class Keyword_CsvController extends Zend_Controller_Action
                             } else {
                                 $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
                             }
-                            Com_Util::sendMulitRequest($url_list, 2);
+                            Com_Util::sendMulitRequest($url_list);
                             break;
                         } elseif ($expandRst == false) {
                             break;
@@ -198,6 +199,31 @@ class Keyword_CsvController extends Zend_Controller_Action
         
         // CSVを作成する
         $csvModel->makeCsv($expand);
+    }
+    
+    public function deleteAction() {
+        
+        $historyid = $this->getRequest()->id;
+        
+        $csvModel = new Keyword_Model_Csv();
+        $csvModel->deleteOrderCsv($historyid, $this->userid);
+        
+        // 待ち中キーワードを取得する
+        $historyid = $this->getNextHistoryid($this->userid);
+        if (!empty($historyid)) {
+            // 非同期処理
+            if (Com_Util::isHttps()) {
+                $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Result-Ajax?historyid=".$historyid."&userid=".$this->userid);
+            } else {
+                $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Result-Ajax?historyid=".$historyid."&userid=".$this->userid);
+            }
+            Com_Util::sendMulitRequest($url_list);   
+        }
+        
+        $orders = $csvModel->getCsvOrderList($this->userid);
+        $this->view->orders = $orders;
+        
+        $this->render("index");
     }
     
     /*------------------------------------------------------------------------

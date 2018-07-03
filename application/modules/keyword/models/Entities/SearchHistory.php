@@ -90,6 +90,15 @@ class Keyword_Model_Entities_SearchHistory extends Db_Abstract
 	    return FALSE;
 	}
 	
+	public function getRecentKeyword($keyword) {
+	    $result = $this->fetchAll($this->select()->where("registdt > date_sub(now(), INTERVAL 5 minute) and kword = ?", $keyword));
+	    if (!empty($result))
+	    {
+	        return $result;
+	    }
+	    return FALSE;
+	}
+	
 	public function updateHistory($data, $where)
 	{
 		try{

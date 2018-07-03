@@ -53,5 +53,11 @@ class Keyword_Model_Entities_ExpandResult extends Db_Abstract
 	    }
 	    return $updCnt;
 	}
+	
+	public function deleteOne($historyid, $site) {
+	    $this->delete(array("historyid = ? " => $historyid,
+	            "site = ? " => $site));
+	    return true;
+	}
 
 }
