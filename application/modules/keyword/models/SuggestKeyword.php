@@ -31,20 +31,23 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	/** 検索キーワードのブロック方法:  0:ブロックしない;1:完全一致;2:部分一致*/
     	$this->blockFlag = 2;
     	 
-    	$this->suggestAry = array("", " ",
-    			"あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ",
-    			"さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と",
-    			"な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
-    			"ま", "み", "む", "め", "も", "や", "ゆ", "よ", 
-    	        "ら", "り", "る", "れ",	"ろ", "わ",
-    			"が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ",
-    			"だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ",
-    			"ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
-    			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-    			"k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-    			"u", "v", "w", "x", "y", "z",
-    			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
-    	);    	 
+//     	$this->suggestAry = array("", " ",
+//     			"あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ",
+//     			"さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と",
+//     			"な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
+//     			"ま", "み", "む", "め", "も", "や", "ゆ", "よ", 
+//     	        "ら", "り", "る", "れ",	"ろ", "わ",
+//     			"が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ",
+//     			"だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ",
+//     			"ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
+//     			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+//     			"k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+//     			"u", "v", "w", "x", "y", "z",
+//     			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+//     	);
+    	
+    	$this->suggestAry = array("", " ", "か", "き", 
+    	);
     }
     
     public function checkKeyword()
@@ -96,7 +99,7 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         		'curloptions' => array(CURLOPT_FOLLOWLOCATION => false),
         ));
         
-        $f_info = Com_Util::readLock("suggest_lock");
+//         $fp = Com_Util::getLock("suggest_lock", 10);
         $errorFlg = false;
         $cnt = count($this->suggestAry);
         
@@ -104,7 +107,7 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
             
             for($i = 0; $i < $cnt; $i++)
             {
-                if ($this->suggestAry[$i] == ""){
+                if ($this->suggestAry[$i] == "") {
                     $newKeyword = $this->keyword;
                 } else {
                     $newKeyword = $this->keyword." ".$this->suggestAry[$i];
@@ -127,14 +130,59 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         } catch(Exception $e) {
         }
     	
-    	Com_Util::releaseLock($f_info[0], null);
+//     	Com_Util::releaseLock($fp);
     	
     	if($errorFlg){
-    		$this->strSuggestKeywords = "<font color='red'>サーバーが混雑しているため、しばらく経ってからご利用ください。</font><br/><br/>※以下の姉妹サイトもお試しください。<br /><a href=\"http://www.yakw.net/\"target=\"_blank\">ヤフーサジェスト キーワード一括ＤＬツール</a><br /><a href=\"http://www.bskw.net/\" target=\"_blank\">ビングサジェストキーワード一括ＤＬツール</a><br /><a href=\"http://www.azkw.net/\" target=\"_blank\">アマゾンサジェストキーワード一括ＤＬツール</a><br /><a href=\"http://www.ytkw.net/\" target=\"_blank\">ユーチューブサジェストキーワード一括ＤＬツール</a><br/><br/>";
+    		$this->strSuggestKeywords = "<font color='red'>サーバーが混雑しているため、しばらく経ってからご利用ください。</font><br/>（<a href=\"https://www.gskw.net/cao.pdf\" target=\"_blank\">混雑の回避方法はこちら</a>）<br/><br/>※以下の姉妹サイトもお試しください。<br /><a href=\"http://www.yakw.net/\"target=\"_blank\">ヤフーサジェスト キーワード一括ＤＬツール</a><br /><a href=\"http://www.bskw.net/\" target=\"_blank\">ビングサジェストキーワード一括ＤＬツール</a><br /><a href=\"http://www.azkw.net/\" target=\"_blank\">アマゾンサジェストキーワード一括ＤＬツール</a><br /><a href=\"http://www.ytkw.net/\" target=\"_blank\">ユーチューブサジェストキーワード一括ＤＬツール</a><br/><br/>";
     		return false;
     	}
     	return true;
     }
+    
+    public function getSuggestKeywordOtherServer($server = Com_Const::SUGGEST_SERVER_GOOGLE)
+    {
+        //initial
+        $client = new Zend_Http_Client();
+        $client->setConfig(array(
+                'adapter'   => 'Zend_Http_Client_Adapter_Curl',
+                'keepalive' => true,
+                'curloptions' => array(CURLOPT_FOLLOWLOCATION => false),
+        ));
+    
+        $url = str_replace("{keyword}", urlencode($this->keyword), $server);
+        $url = str_replace("{p}", Com_Util::encrypt(date("Ymd")), $url);
+        $client->setUri($url);
+
+        //send request
+        $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE);
+        if ($response == Com_Const::FORBIDDEN || $response == null) {
+            // error, 403 forbidden
+            return false;
+        } else {
+            
+            try {
+                $resAry = json_decode($response);
+                
+                if (is_object($resAry)) {
+                    $this->strSuggestKeywords = $resAry->sk;
+                    $this->indexTab = $resAry->indextab;
+                    $this->rstCnt = $resAry->rstCnt;
+                    
+                    if (strpos($resAry->sk, "サーバーが混雑しているため") !== FALSE) {
+                        return false;
+                    }
+                }
+                
+            } catch (Exception $e) {
+                echo $e->getMessage();
+                return false;
+            }
+        }
+         
+        return true;
+    }
+    
+    
     
     public function getRecentKeyword() {
         $dao = new Keyword_Model_Entities_SearchHistory();

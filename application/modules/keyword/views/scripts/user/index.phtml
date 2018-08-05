@@ -3,9 +3,12 @@ input{ width:80px; }
 input[name=name] { width:140px; }
 input[name=email] { width:180px; }
 input[type=checkbox] { width:19px; }
-input[name=password] { width:80px; }
+input[name=password] { width:90px; }
 #regist{ width:80px; }
 .title{ color:blue; }
+#historytab {width:840px;}
+.require {color:red;}
+.service {display:inline-block;margin-left:4px;width:15px;text-align:center;}
 </style>
 
 <span style="color: red;"><?php echo $this->msg;?></span>
@@ -13,11 +16,18 @@ input[name=password] { width:80px; }
 <span class="title"><b>ユーザー情報登録：</b></span>
 <table id="historytab" align="center">
 <tr>
-    <td width="12%">ID(必須)</d>
-    <td width="20%">ユーザー名(必須)</td>
+    <td width="12%">ID(<span class="require">*</span>)</d>
+    <td width="20%">ユーザー名(<span class="require">*</span>)</td>
     <td width="24%">メール</td>
-    <td width="16%">パスワード(必須)</td>
-    <td width="28%"> &nbsp;G&nbsp;&nbsp; Y&nbsp;&nbsp; B&nbsp;&nbsp; A&nbsp; T</td>
+    <td width="14%">パスワード(<span class="require">*</span>)</td>
+    <td width="30%"> 
+			<span class="service">G</span>
+			<span class="service">Y</span>
+			<span class="service">B</span>
+			<span class="service">A</span>
+			<span class="service">T</span>
+			<span class="service">０</span>
+	</td>
 </tr>
 <tr>
     <td><input type="text" id="id" name="id" value="<?php echo $this->id; ?>"/></td>
@@ -26,11 +36,13 @@ input[name=password] { width:80px; }
     <td><input type="text" id="password" name="password" value="<?php echo $this->password; ?>"/></td>
     
     <td>
-		<input type="checkbox" name="site[]" id="g" value="1"/>
-		<input type="checkbox" name="site[]" id="ya" value="4"/>
-		<input type="checkbox" name="site[]" id="b" value="3"/>
-		<input type="checkbox" name="site[]" id="a" value="2"/>
-		<input type="checkbox" name="site[]" id="yt" value="5"/> 
+		<span class="service"><input type="checkbox" name="site[]" id="g"  value="1"/></span>
+		<span class="service"><input type="checkbox" name="site[]" id="ya" value="4"/></span>
+		<span class="service"><input type="checkbox" name="site[]" id="b"  value="3"/></span>
+		<span class="service"><input type="checkbox" name="site[]" id="a"  value="2"/></span>
+		<span class="service"><input type="checkbox" name="site[]" id="yt" value="5"/></span>
+		
+		<span class="service"><input type="checkbox" name="zero" id="zero" value="1"/></span>
     	<input type="submit" id="regist" value="登録"/>
     </td>
 </tr>
@@ -43,11 +55,18 @@ input[name=password] { width:80px; }
 <span class="title"><b>ユーザー情報更新：</b></span>
 <table id="historytab" align="center">
 <tr>
-    <td width="12%">ID(必須)</d>
-    <td width="20%">ユーザー名(必須)</td>
+    <td width="12%">ID(<span class="require">*</span>)</td>
+    <td width="20%">ユーザー名(<span class="require">*</span>)</td>
     <td width="24%">メール</td>
-    <td width="16%">パスワード(必須)</td>
-    <td width="28%"> &nbsp;G&nbsp;&nbsp; Y&nbsp;&nbsp; B&nbsp;&nbsp; A&nbsp; T</td>
+    <td width="14%">パスワード(<span class="require">*</span>)</td>
+    <td width="30%"> 
+    	<span class="service">G</span>
+    	<span class="service">Y</span>
+    	<span class="service">B</span>
+    	<span class="service">A</span>
+    	<span class="service">T</span>
+    	<span class="service">０</span>
+	</td>
 </tr>
 
 <?php 
@@ -70,13 +89,17 @@ if ($this->users) {
         	       '<td><input type="text" name="email" value="'.$email.'"/></td>'.
         	       '<td><input type="text" name="password" value="'.$password.'"/></td>'.
         	       '<td>
-            		<input type="checkbox" name="site[]"  id="g"  value=1 '.(strpos($site, "1") !== false ? "checked": "").'/>
-            		<input type="checkbox" name="site[]" id="ya" value=4 '.(strpos($site, "4") !== false ? "checked": "").'/>
-            		<input type="checkbox" name="site[]"  id="b"  value=3 '.(strpos($site, "3") !== false ? "checked": "").'/>
-            		<input type="checkbox" name="site[]"  id="a"  value=2 '.(strpos($site, "2") !== false ? "checked": "").'/>
-            		<input type="checkbox" name="site[]" id="yt" value=5 '.(strpos($site, "5") !== false ? "checked": "").'/> 
-                        <button name="updbtn" uid='.$id.' >更新</button> <span style="color:red;"></span>&nbsp;&nbsp;
-                        <button name="delbtn" '. ($row["type"] == 9 ? 'style="display:none;"' : "").' uid='.$id.' >削除</button></td>'.
+            		<span class="service"><input type="checkbox" name="site[]"  id="g"  value=1 '.(strpos($site, "1") !== false ? "checked": "").'/></span>
+            		<span class="service"><input type="checkbox" name="site[]"  id="ya" value=4 '.(strpos($site, "4") !== false ? "checked": "").'/></span>
+            		<span class="service"><input type="checkbox" name="site[]"  id="b"  value=3 '.(strpos($site, "3") !== false ? "checked": "").'/></span>
+            		<span class="service"><input type="checkbox" name="site[]"  id="a"  value=2 '.(strpos($site, "2") !== false ? "checked": "").'/></span>
+            		<span class="service"><input type="checkbox" name="site[]"  id="yt" value=5 '.(strpos($site, "5") !== false ? "checked": "").'/></span>
+		            
+                    <span class="service"><input type="checkbox" name="zero"    id="zero" value=1 '.($row["zero"] == 1 ? "checked": "").'/></span>
+		  &nbsp;&nbsp;<button name="updbtn" uid='.$id.' >更新</button>
+                        <button name="delbtn" '. ($row["type"] == 9 ? 'style="display:none;"' : "").' uid='.$id.' >削除</button>
+		        
+		        <span class="require"></span></td>'.
                 '</tr>';
     };    
 }
@@ -88,6 +111,7 @@ if ($this->users) {
 <input type="hidden" id="updemail" name="updemail"/>
 <input type="hidden" id="updpassword" name="updpassword"/>
 <input type="hidden" id="site" name="site"/>
+<input type="hidden" id="updzero" name="updzero"/>
 </form>
 
 <script type="text/javascript">
@@ -109,19 +133,27 @@ function check() {
 
 $("button[name=delbtn]").click(function(){
 
+	if (!confirm("ID:[" + $(this).attr("uid") + "]の情報を削除します。よろしいですか？")) {
+		return false;
+	}
+	
 	$("#updid").val($(this).attr("uid"));
 	$("#frm").attr("action", "/keyword/user/delete");
 	$("#frm").submit();
 });
 
 $("input[type=checkbox]").click(function(){
-	var span = $(this).closest("tr").find("span:eq(0)");
+	var span = $(this).closest("tr").find("span[class=require]:eq(0)");
 	span.text(" *");	
 });
 
 $("button[name=updbtn]").click(function(){
 
 	$("#updid").val($(this).attr("uid"));
+
+	if (!confirm("ID:[" + $(this).attr("uid") + "]の情報を更新します。よろしいですか？")) {
+		return;
+	}
 
 	var password = $(this).closest("tr").find("input[name='password']").val();
 	if (password == "") {
@@ -139,7 +171,7 @@ $("button[name=updbtn]").click(function(){
 	$("#updpassword").val(password);
 
 	var site = "";
-	var chks = $(this).closest("tr").find("input[type='checkbox']:checked");	
+	var chks = $(this).closest("tr").find("input[name='site[]']:checked");	
 	$.each(chks, function(i, chk) {
 		if (i == 0) {
 			site = $(chk).val();
@@ -148,6 +180,13 @@ $("button[name=updbtn]").click(function(){
 		}
 	});
 	$("#site").val(site);
+
+	var zero = "";
+	var chks = $(this).closest("tr").find("input[id='zero']:checked");
+	if (chks.length > 0) {
+		zero = 1;
+	}
+	$("#updzero").val(zero);
 	
 	$("#frm").attr("action", "/keyword/user/update");
 	$("#frm").submit();

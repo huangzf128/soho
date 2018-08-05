@@ -100,7 +100,7 @@ if ( $spmode ) {
 <?php } else { ?>
 		<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
 <?php } 
-      if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) { ?>
+      if (Com_Util::isCsvServiceEnabled(Com_Const::SERVICE_CSV_G)) { ?>
 		<input name="　　検　索　　2" type="button" value="　csv取得(予約)　" class="madoww4 csvorder" style="color:white;background-image: url(/_img/bt_csv_order.jpg);">
 <?php } ?>
 
@@ -126,7 +126,7 @@ if ( $spmode ) {
 <?php } else { ?>
 		<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
 <?php } 
-      if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) { ?>
+      if (Com_Util::isCsvServiceEnabled(Com_Const::SERVICE_CSV_G)) { ?>
 		<input name="　　検　索　　2" type="button" value="　csv取得(予約)　" class="madoww4 csvorder" style="color:white;background-image: url(/_img/bt_csv_order.jpg);">
 <?php } ?>
 

@@ -1,26 +1,49 @@
 <?php
+require_once 'Mcrypt.php';
 
 Class Com_Util
 {
 	public function __construct(){}
 	
 	public static function encrypt($plain_text) {
-	    
-// 	    $c_t = openssl_encrypt($plain_text, 'AES-128-ECB', Com_Const::KEY);
-// 	    return $c_t;
-	    return $plain_text;
+	    $mcrypt = new Mcrypt();
+	    return $mcrypt->encrypt($plain_text); ;
 	}
 	
 	public static function decrypt($crypt_text) {
-// 	    $p_t = openssl_decrypt($crypt_text, 'AES-128-ECB', Com_Const::KEY);
-// 	    return $p_t;
-	    
-	    return $crypt_text;
+	    $mcrypt = new Mcrypt();
+	    return $mcrypt->decrypt($crypt_text);
 	}
 	
 	public static function isHttps() {
 	    // httpsで通信しているかどうか
 	    return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
+	}
+	
+	public static function isCsvServiceEnabled ($serviceid) {
+	    
+	    $zend_session = new Zend_Session_Namespace("auth");
+	    
+	    if (false === isset($zend_session->service) || false === array_key_exists("csv", $zend_session->service)) {
+	        return false;
+	    }
+	    
+	    $service = $zend_session->service;
+	    if ($serviceid == Com_Const::SERVICE_CSV_G) {
+	        return strpos($service["csv"], Com_Const::GOOGLE."") !== false;
+	    }
+	}
+	
+	// parameter not use
+	public static function isZeroServiceEnabled ($serviceid) {
+	    $zend_session = new Zend_Session_Namespace("auth");
+	     
+	    if (false === isset($zend_session->service) || false === array_key_exists("zero", $zend_session->service)) {
+	        return false;
+	    }
+	    
+	    $service = $zend_session->service;
+	    return ($service["zero"] == 1);
 	}
 	
 	public static function filter($str) {
@@ -82,9 +105,9 @@ Class Com_Util
 	            }
 	        }
 	         
-	    } catch (Zend_Http_Client_Exception $e) {
+	    } catch (Exception $e) {
 	        //echo '<p>エラーが発生しました (' .$e->getMessage(). ')</p>';
-	        Com_Log::registErrorLog($e->getMessage(), "sendAPIRequest:catch", null , null, $site);
+	        Com_Log::registErrorLog($e->getMessage(), "sendAPIRequest:catch", $client->getUri(true) , null, $site);
 	    }
 	    return null;
 	}
@@ -105,7 +128,7 @@ Class Com_Util
 	        } else {
 	
 	            // some error
-	            Com_Log::registApiErrorLog($response->getMessage(), "sendAPIRequest: try", $response->getStatus(), $client->getUri(true), $site);
+	            Com_Log::registApiErrorLog($response->getMessage(), "sendAPIRequestServer: try", $response->getStatus(), $client->getUri(true), $site);
 	        }
 	
 	    } catch (Exception $e) {
@@ -148,18 +171,17 @@ Class Com_Util
 	    } while ($active > 0);
 	}
 	
-	public static function getFromReplaceServer($client, $site)
+	public static function getFromReplaceServer($client, $posts, $site)
 	{
 	    try {
 	        
-	        $file_name = "log/server";
 	        $servers = array();
-	
-	        $fp = fopen($file_name, 'a+');
-	        while (!flock ($fp, LOCK_EX)) {
-	            usleep(1000);
+	        if ($site == Com_Const::GOOGLE) {
+	            $fp = self::getLock("server", 60);
+	        } else {
+	            $fp = self::getLock("server");
 	        }
-	
+	        
 	    	for($line = 1; !feof($fp); $line++) {
 	            $lines = fgets($fp);
 	            if($lines) {
@@ -178,21 +200,25 @@ Class Com_Util
 	                $minutes = (int)($diff / 60);
 	            }
 	
-	            Com_Log::registApiErrorLog("test change 1", $key, $response, $servers[$key], $site);
-	             
 	            if ($value == 1 ||
 	                    $minutes > 30 ||
 	                    (4 < $minutes && $minutes < 8) ||
 	                    (14 < $minutes && $minutes < 18) ||
 	                    (24 < $minutes && $minutes < 28)) {
 	
-                            // ★★★★★★
-	                        $client->setUri($key);
 	                        // ★★★★★★
-	                        Com_Log::registApiErrorLog("test change 2", $key, $response, $servers[$key], $site);
-	
+	                        $client = new Zend_Http_Client();
+	                        $client->setConfig(array(
+	                                'adapter'   => 'Zend_Http_Client_Adapter_Curl',
+	                                'keepalive' => true,
+	                                'curloptions' => array(CURLOPT_FOLLOWLOCATION => false),
+	                        ));
+	                         
+	                        $client->setUri($key);
+	                        $client->setParameterPost($posts);
+	                        // ★★★★★★
+	                        
 	                        $response = Com_Util::sendAPIRequestServer($client, $site, "POST");
-	                        Com_Log::registApiErrorLog("test change", $key, $response, $servers[$key], $site);
 	
 	                        if ($response == null || $response == Com_Const::FORBIDDEN  ) {
 	                            
@@ -200,16 +226,15 @@ Class Com_Util
 	                                $servers[$key] = date("Y/m/d H:i:s");
 	                                Com_Log::registApiErrorLog("server down", $key, "", "server", $site);
 	                            }
-                                else {
-                                    Com_Log::registApiErrorLog("test change 3", $key, $response, $servers[$key], $site);
-                                }
+
+	                            Com_Log::registApiErrorLog("server wrong", $key, $response, "server", $site);
+	                             
 	                            sleep(2);
 	                            continue;
 	                        } else {
 	                            $servers[$key] = 1;
-	
 	                            $retVal = array($response, $key);
-	
+
 	                            Com_Log::registApiErrorLog("server change", $key, $response, "", $site);
 	                            break;
 	                        }
@@ -223,12 +248,13 @@ Class Com_Util
 	        }
 	
 	        try {
-                ftruncate($fp, 0);
-                fwrite($fp,  $contents);
+	            if (!empty($contents)) {
+	                ftruncate($fp, 0);
+	                fwrite($fp,  $contents);
+	            }
                 flock($fp, LOCK_UN);
                 fclose($fp);
             } catch(Exception $e) {
-               Com_Log::registApiErrorLog("exception", $e->getMessage(), "", "", $site);
 	           return false;
             }
 	        
@@ -236,58 +262,58 @@ Class Com_Util
 	
 	    } catch (Exception $e) {
 	        Com_Log::registApiErrorLog("some Exception", $e->getMessage(), "", "", $site);
+
+	        try {
+	            if ($fp) {
+	                flock($fp, LOCK_UN);
+	                fclose($fp);
+	            }
+	        } catch (Exception $e) {
+	           Com_Log::registApiErrorLog("Util line-243:", $e->getMessage(), "", "", $site);
+	        }
 	        return false;
 	    }
 	}
 	
-	public static function readLock($filename) {
+	public static function getLock($filename, $timeout = Com_Const::FILE_LOCK_TIMEOUT) {
 	
-	    $fp = fopen("log/".$filename, 'a+');
-	    while (!flock ($fp, LOCK_EX)) {
-	        usleep(1000);
-	    }
-	
-	    for($line = 1; !feof($fp); $line++) {
-	        $lines = fgets($fp);
-	        if($lines) {
-	            $tmp = explode("---", $lines);
-	            $servers[$tmp[0]] = trim(preg_replace('/\s+/', ' ', $tmp[1]));
-	        }
-	    }
-	
-	    return array($fp, $servers);
+	    $filepath = "log/".$filename;
+	    
+	    $fp = fopen($filepath, 'a+');
+	    $start = time(true);
+	    
+        while (!flock ($fp, LOCK_EX | LOCK_NB)) {
+            if ((time(true) - $start) > $timeout) {
+        
+                unlink($filepath);
+                $fp = fopen($filepath, 'a+');
+                
+                $errMsg = array(date('Y-m-d H:i:s'), $filepath);
+                Com_Util::write("lock_error", implode(": ", $errMsg)."\n", "a+");
+                break;
+            }
+            sleep(1);
+        }
+        
+	    return $fp;
 	}
 	
-	public static function releaseLock($fp, $servers) {
+	public static function releaseLock($fp) {
 	    
-        // 書き戻す
-        $contents = null;
-	    if ($servers != null && is_array($servers)) {
-	        foreach($servers as $key => $value) {
-	            $contents .= ($key."---".$value."\n");
-	        }
-	    }
-	    
-	    if ($fp) {
-	        try {
-	            if ($contents !== null) {
-	                ftruncate($fp, 0);
-	                fwrite($fp,  $contents);
-	            }
-
-	            flock($fp, LOCK_UN);
-	            fclose($fp);
-	        } catch(Exception $e) {
-	            fclose($fp);
-	            return false;
-	        }
-	    }
+        if ($fp) {
+            try {
+                flock($fp, LOCK_UN);
+                fclose($fp);
+            } catch(Exception $e) {
+                fclose($fp);
+            }
+        }
 	}
 	
-	static function write($filename, $content){
+	static function write($filename, $content, $mode = 'w'){
 	
 	    try{
-	        $fp = fopen("log/".$filename, 'w');
+	        $fp = fopen("log/".$filename, $mode);
 	
 	        if ($fp){
 	            if (flock($fp, LOCK_EX)){

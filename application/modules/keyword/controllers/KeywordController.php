@@ -6,15 +6,22 @@ class Keyword_KeywordController extends Zend_Controller_Action
 	private $accessTimeLimit = 60;
 	private $accessCountLimit = 4;
 	private $userid = null;
+	private $service = null;
 	
     public function init()
     { 
         $zend_session = new Zend_Session_Namespace("auth");
         if (isset($zend_session->userid)) {
-            $this->_helper->layout->assign('userid', $zend_session->userid);
             $this->userid = $zend_session->userid;
+            $this->service = $zend_session->service;
+            
+            $this->_helper->layout->assign('userid', $zend_session->userid);
+            $this->_helper->layout->assign('service', $zend_session->service);
             $this->_helper->layout->assign('usertype', $zend_session->type);
             $this->_helper->layout->assign('username', $zend_session->username);
+            
+            $zend_session->lastModified = time();
+            $zend_session->setExpirationSeconds(Com_Const::SESSION_EXPIRE);
         }
         
         $model = new Keyword_Model_SuggestKeyword(null);
@@ -81,21 +88,30 @@ class Keyword_KeywordController extends Zend_Controller_Action
 		    return;
 		}
 		
-		// 検索
-		$result = $model->getSuggestKeyword();
-        
-        $layout->assign('keyword', $keyword);
-        $layout->assign('rstCnt', $model->getRstCnt());
-        $this->view->sk = $model->getStrSuggestKeywords();  // 検索結果
-        $this->view->indextab = $model->getIndexTab();      // 索引
-        
-        $registFlg = $this->getRequest()->registflg;
-        //検索情報をDB登録
-        if(isset($registFlg) && $registFlg == 1 && $result){
-            
-        	$model->setRegistdt(date('Y-m-d H:i:s'));
-        	$this->view->historyid = $model->registSearchHistoryResult();
-        }
+		if (Com_Util::isZeroServiceEnabled(Com_Const::SERVICE_ZERO_G)) {
+		    // 有料
+		    $result = $model->getSuggestKeyword();
+		    if ($result === Com_Const::FORBIDDEN) {
+		        $result = $model->getSuggestKeywordOtherServer(Com_Const::SUGGEST_SERVER_GOOGLE_SECOND);
+		    }
+		} else {
+		    // 無料
+		    $result = $model->getSuggestKeywordOtherServer();
+		}
+	    
+	    $layout->assign('keyword', $keyword);
+	    $layout->assign('rstCnt', $model->getRstCnt());
+	    $this->view->sk = $model->getStrSuggestKeywords();  // 検索結果
+	    $this->view->indextab = $model->getIndexTab();      // 索引
+	    
+	    $registFlg = $this->getRequest()->registflg;
+	    //検索情報をDB登録
+	    if(isset($registFlg) && $registFlg == 1 && $result){
+	    
+	        $model->setRegistdt(date('Y-m-d H:i:s'));
+	        $this->view->historyid = $model->registSearchHistoryResult();
+	    }
+		    
     }
     
     /**

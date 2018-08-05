@@ -16,6 +16,7 @@ class Keyword_Model_Entities_SearchUser extends Db_Abstract
 		$srchRst->email = $info['email'];
 		$srchRst->password = $info['password'];
 		$srchRst->site = $info['site'];
+		$srchRst->zero = $info['zero'];
 		
 		$srchRst->type = $info['type'];
 		$srchRst->valid = $info['valid'];

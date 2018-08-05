@@ -7,8 +7,14 @@ class Keyword_IndexController extends Zend_Controller_Action
     {
         $zend_session = new Zend_Session_Namespace("auth");
         if (isset($zend_session->userid)) {
-            $this->_helper->layout->assign('usertype', $zend_session->type);
+            
+            $this->_helper->layout->assign('userid', $zend_session->userid);
             $this->_helper->layout->assign('username', $zend_session->username);
+            $this->_helper->layout->assign('usertype', $zend_session->type);
+            $this->_helper->layout->assign('service', $zend_session->service);
+            
+            $zend_session->lastModified = time();
+            $zend_session->setExpirationSeconds(Com_Const::SESSION_EXPIRE);
         }
     }
 
@@ -24,21 +30,30 @@ class Keyword_IndexController extends Zend_Controller_Action
         $model = new Keyword_Model_User();
         $user = $model->getUser($id);
         
-        if ($user && $user['password'] == $password && strpos($user["site"], Com_Const::GOOGLE."") !== false) {
-            
+        if ($user && $user['password'] == $password && 
+                (strpos($user["site"], Com_Const::GOOGLE."") !== false || 
+                 $user["zero"] == 1)) {
+
+            Zend_Session::regenerateId();
             $zend_session = new Zend_Session_Namespace("auth");
             
             $zend_session->userid = $user["id"];
             $zend_session->type = $user["type"];
             $zend_session->username = $user["name"];
+            $zend_session->service = array("zero" => $user["zero"], "csv" => $user["site"]);
+            $zend_session->lastModified = time();
+            
+            $zend_session->setExpirationSeconds(Com_Const::SESSION_EXPIRE);
             
             if ($user["type"] == Com_Const::USER_ADMIN) {
                 // 管理者
                 $this->_redirect('/keyword/user');
             }
             
+            $this->_helper->layout->assign('userid', $zend_session->userid);
             $this->_helper->layout->assign('usertype', $zend_session->type);
             $this->_helper->layout->assign('username', $zend_session->username);
+            $this->_helper->layout->assign('service', $zend_session->service);
             
             $this->_helper->viewRenderer->setRender('index');
             
@@ -51,10 +66,16 @@ class Keyword_IndexController extends Zend_Controller_Action
     
     public function logoutAction() 
     {
-        Zend_Session::destroy();
-        $this->_helper->layout->assign('usertype', null);
+        Zend_Session::namespaceUnset('auth');
+        Zend_Session::forgetMe();
+        Zend_Session::regenerateId();
+        
+        //Zend_Session::destroy();
+        
+        $this->_helper->layout->assign('userid', null);
         $this->_helper->layout->assign('username', null);
         $this->_helper->layout->assign('usertype', null);
+        $this->_helper->layout->assign('service', null);
         
         $this->_helper->viewRenderer->setRender('index');
     }

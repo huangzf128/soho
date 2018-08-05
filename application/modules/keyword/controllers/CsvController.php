@@ -9,9 +9,15 @@ class Keyword_CsvController extends Zend_Controller_Action
         $zend_session = new Zend_Session_Namespace("auth");
         if (isset($zend_session->userid)) {
             $this->userid = $zend_session->userid;
-            $this->_helper->layout->assign('usertype', $zend_session->type);
+            
+            $this->_helper->layout->assign('userid', $zend_session->userid);
             $this->_helper->layout->assign('username', $zend_session->username);
-        } 
+            $this->_helper->layout->assign('usertype', $zend_session->type);
+            $this->_helper->layout->assign('service', $zend_session->service);
+            
+            $zend_session->lastModified = time();
+            $zend_session->setExpirationSeconds(Com_Const::SESSION_EXPIRE);
+        }
     }
 
     /**
@@ -19,9 +25,13 @@ class Keyword_CsvController extends Zend_Controller_Action
      */
     public function indexAction()
     {
-        $csvModel = new Keyword_Model_Csv();
-        $orders = $csvModel->getCsvOrderList($this->userid);
-        $this->view->orders = $orders;
+        if (Com_Util::isCsvServiceEnabled(Com_Const::SERVICE_CSV_G)) {
+            $csvModel = new Keyword_Model_Csv();
+            $orders = $csvModel->getCsvOrderList($this->userid);
+            $this->view->orders = $orders;
+        } else {
+            $this->_redirect('/keyword/index');
+        }
     }
 
     public function csvFileOrderAction()
@@ -30,6 +40,11 @@ class Keyword_CsvController extends Zend_Controller_Action
         $this->_helper->viewRenderer->setNoRender(true);
     
         $historyid = $this->getRequest()->historyid;
+        
+        if (empty($historyid) || empty($this->userid)) {
+            echo "0";
+            return;
+        }
         
         try {
             // 予約に入れる
@@ -72,7 +87,8 @@ class Keyword_CsvController extends Zend_Controller_Action
         
         $interruptinfo = array(0,0,0);
         if ($row) {
-            $interruptinfo = explode("-", $row["interruptinfo"]);
+            //$interruptinfo = explode("-", $row["interruptinfo"]);
+            $interruptinfo = $this->splitInterruptinfo("-", $row["interruptinfo"]);
         }
         
         if ($interruptinfo[2] === $rand) {
@@ -91,12 +107,8 @@ class Keyword_CsvController extends Zend_Controller_Action
                 
                 // Com_Log::registExpandLog($callApiTimes, "Sleep", "historyid: ".$historyid, null, Com_Const::GOOGLE);
                 
-                if (Com_Util::isHttps()) {
-                    $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$newRand);
-                } else {
-                    $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$newRand);
-                }
-                Com_Util::sendMulitRequest($url_list);
+                $this->callInterruptedRequest($historyid, $newRand);
+                
                 return;
             }
             
@@ -106,13 +118,8 @@ class Keyword_CsvController extends Zend_Controller_Action
                     
                     $expandRst = $this->createExpandCsv($historyid, $startTime, $csvModel);
                     if (is_int($expandRst)) {
-                        // 中断
-                        if (Com_Util::isHttps()) {
-                            $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
-                        } else {
-                            $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
-                        }
-                        Com_Util::sendMulitRequest($url_list);
+                        
+                        $this->callInterruptedRequest($historyid, $expandRst);
                         break;
                     } elseif ($expandRst == false) {
                         break;
@@ -130,7 +137,8 @@ class Keyword_CsvController extends Zend_Controller_Action
             }
         }
     }
-        
+    
+    
     // CSV 展開する
     public function expandResultAjaxAction() {
         
@@ -159,13 +167,9 @@ class Keyword_CsvController extends Zend_Controller_Action
                     if ($rst) {
                         $expandRst = $this->createExpandCsv($historyid, $startTime, $csvModel);
                         if (is_int($expandRst)) {
-                            // 中断
-                            if (Com_Util::isHttps()) {
-                                $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
-                            } else {
-                                $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$expandRst);
-                            }
-                            Com_Util::sendMulitRequest($url_list);
+                            
+                            $this->callInterruptedRequest($historyid, $expandRst);
+                            
                             break;
                         } elseif ($expandRst == false) {
                             break;
@@ -230,6 +234,17 @@ class Keyword_CsvController extends Zend_Controller_Action
      *  private
      *------------------------------------------------------------------------*/
     
+    private function splitInterruptinfo($delimiter, $interruptinfo) {
+        
+        $parts = explode($delimiter, $interruptinfo);
+        
+        $first = array_shift($parts);
+        $last = array_pop($parts);
+        $middle = trim(implode($delimiter, $parts));
+        
+        return array($first, $middle, $last);
+    }
+    
     private function getRandNum($calApiTimes) {
         $rand = rand(1000, 9999);
         $rand = $rand * 1000 + $calApiTimes;
@@ -241,11 +256,23 @@ class Keyword_CsvController extends Zend_Controller_Action
             return true;
         }
         
-        $interruptinfo = explode("-", $expandRst["interruptinfo"]);
+        // $interruptinfo = explode("-", $expandRst["interruptinfo"]);
+        $interruptinfo = $this->splitInterruptinfo("-", $expandRst["interruptinfo"]);
+        
         if ($level < $interruptinfo[0]) {
             return false;
         }
         return true;
+    }
+    
+    private function callInterruptedRequest($historyid, $rand) {
+        // 中断
+        if (Com_Util::isHttps()) {
+            $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$rand);
+        } else {
+            $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Interrupted-Result-Ajax?historyid=".$historyid."&userid=".$this->userid."&rand=".$rand);
+        }
+        Com_Util::sendMulitRequest($url_list, 2);
     }
     
     private function createExpandCsv($historyid, $startTime, $csvModel) {
@@ -254,7 +281,9 @@ class Keyword_CsvController extends Zend_Controller_Action
             // get history
             $expandRst = $csvModel->getExpandResult($historyid);
             $expandKeywords = $expandRst["result"];
-            $interruptinfo = explode("-", $expandRst["interruptinfo"]);
+            //$interruptinfo = explode("-", $expandRst["interruptinfo"]);
+            $interruptinfo = $this->splitInterruptinfo("-", $expandRst["interruptinfo"]);
+            
             
             // expand Search
             for ($i = 0; $i < Com_Const::CSV_EXPAND_LEVEL_MAX; $i++) {
@@ -330,6 +359,53 @@ class Keyword_CsvController extends Zend_Controller_Action
         }catch(Exception $e){
             new Exception($e->getMessage());
         }
+    }
+    
+    public function testAction() {
+        
+        $api = "http://kw:8888/result";
+        $keyword = "football";
+        
+        $keyRes = array("1" => "football", "2" => "akb48");
+        
+        $posts = array(
+                'site' => Com_Const::GOOGLE,
+                'keyword' => urlencode(json_encode($keyRes))
+        );
+        
+        $client = new Zend_Http_Client();
+        $client->setConfig(array(
+                'adapter'   => 'Zend_Http_Client_Adapter_Curl',
+                'keepalive' => true,
+                'curloptions' => array(CURLOPT_FOLLOWLOCATION => false),
+        ));
+        
+        try {
+            $client->setUri($api);
+            $client->setParameterPost($posts);
+            $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE, "POST");
+            
+        } catch (Exception $e) {}
+        
+        if (!$response || in_array($response, array(Com_Const::FORBIDDEN, Com_Const::SERVICEUNAVAILABLE, Com_Const::EAPPIDERR)) ) {
+             
+            $otherServerRes = Com_Util::getFromReplaceServer($client, $posts, Com_Const::GOOGLE);
+            if ($otherServerRes == false) {
+                 
+                Com_Log::registApiErrorLog("game", "over", "0件", mb_convert_encoding($keyword, "shift-jis"), Com_Const::GOOGLE);
+                 
+                return Com_Const::FORBIDDEN;
+            } else {
+                // success
+                $response = $otherServerRes[0];
+                $api = $otherServerRes[1];
+            }
+        }
+        
+        $response = json_decode($response);
+        
+        echo var_dump($response);
+        
     }
 }
 

@@ -92,8 +92,7 @@ if ( $spmode ) {
 <header>
 
 <?php 
-
-if ($this->layout()->usertype != null) {
+if (Com_Util::isCsvServiceEnabled(Com_Const::SERVICE_CSV_G)) {
     echo '<div style="float:right;color:blue;margin-top:0px;">';
 
     $username = "こんにちは、<B>".$this->layout()->username."</B>　様　";

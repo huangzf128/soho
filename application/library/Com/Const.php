@@ -6,11 +6,14 @@ Class Com_Const
 	
 	// システム用共通変数
 	const CSV_EXPAND_LEVEL_MAX = 3;	           // CSV展開階層
-	const CSV_EXPAND_PER_WAITTIME = 40;        // API呼びだし待ちタイム
+	const CSV_EXPAND_PER_WAITTIME = 30;        // API呼びだし待ちタイム
 	const CSV_EXPAND_PER_WAITTIME_G = 15;      // API呼びだし待ちタイム Google
-	
+
 	const MAX_RST_COUNT = 10;                  // 取得最大キーワード数
 	const EAPPID_RETRY_COUNT = 5;              // Yahoo専用
+	
+	const FILE_LOCK_TIMEOUT = 15;
+	const SESSION_EXPIRE = 1440;
 	
 	// -------------------------------------------
 	//     プログラム用 
@@ -24,7 +27,8 @@ Class Com_Const
 	
 	// csv default server
 	// const CSV_SERVER_GOOGLE = "http://ad8.coolblog.jp/kw/result?site={site}&keyword=";
-	const CSV_SERVER_GOOGLE = "http://www.kword.lrv.jp/result";
+	const SUGGEST_SERVER_GOOGLE = "http://line.b4.valueserver.jp/kw/keywordco/search/get-Suggest-Keyword?keyword={keyword}&p={p}";
+	const SUGGEST_SERVER_GOOGLE_SECOND = "http://medical-blog.net/kw/keywordco/search/get-Suggest-Keyword?keyword={keyword}&p={p}";
 	
 	
 	const KEY = 'gskwazkwyakwytkw2018.LONGLONGLONG';
@@ -56,5 +60,18 @@ Class Com_Const
     // 実行タイム(秒)
     const EXECUTE_TIME_G = 120;
     const EXECUTE_TIME = 50;
+    
+    // service
+    const SERVICE_ZERO_G = "zero_google";
+    const SERVICE_ZERO_A = "zero_amazon";
+    const SERVICE_ZERO_B = "zero_bing";
+    const SERVICE_ZERO_YA = "zero_yahoo";
+    const SERVICE_ZERO_YT = "zero_youtube";
+    
+    const SERVICE_CSV_G = "csv_google";
+    const SERVICE_CSV_A = "csv_amazon";
+    const SERVICE_CSV_B = "csv_bing";
+    const SERVICE_CSV_YA = "csv_yahoo";
+    const SERVICE_CSV_YT = "csv_youtube";
     
 }

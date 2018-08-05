@@ -9,8 +9,11 @@ class Keyword_UserController extends Zend_Controller_Action
         $zend_session = new Zend_Session_Namespace("auth");
         if (isset($zend_session->userid)) {
             $this->userid = $zend_session->userid;
-            $this->_helper->layout->assign('usertype', $zend_session->type);
+            
+            $this->_helper->layout->assign('userid', $zend_session->userid);
             $this->_helper->layout->assign('username', $zend_session->username);
+            $this->_helper->layout->assign('usertype', $zend_session->type);
+            $this->_helper->layout->assign('service', $zend_session->service);
         } else {
             
             $fun = $this->getRequest()->f;
@@ -35,25 +38,29 @@ class Keyword_UserController extends Zend_Controller_Action
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         
-        $info = $this->getRequest()->info;
-        $info = Com_Util::decrypt(urldecode($info));
+        $info = urldecode($this->getRequest()->info);
+        $info = str_replace(" ", "+", $info);
         
-        parse_str($info, $user);
+        $info = Com_Util::decrypt($info);
         
-        $id = $user["id"];
-        $password = $user["p"];
-        $site = $user["site"];
+        parse_str($info, $u);
+        
+        $id = $u["id"];
+        $password = $u["p"];
+        $site = $u["site"];
         
         $userModel = new Keyword_Model_User();
         $user = $userModel->getUser($id);
         
-        if ($user != null && $user['password'] == $password && strpos($user["site"], $site) !== false) {
-            echo Com_Util::encrypt($user["name"]);
-            return;
-        }
         
+        if ($user != FALSE && $user['password'] == $password && strpos($user["site"], $site) !== false) {
+            $userinfo = array("id" => $id, "name" => $user["name"]);
+        } else {
+            $userinfo = array("id" => $id, "name" => "failure");
+        }
         ob_clean();
-        echo Com_Util::encrypt("failure");
+        echo json_encode($userinfo);
+        return;
     }
     
     public function registAction() {
@@ -70,6 +77,7 @@ class Keyword_UserController extends Zend_Controller_Action
         } else {
             $data["site"] = implode("", $site);
         }
+        $data["zero"] = empty($this->getRequest()->zero) ? 0 : 1;
         
         $model = new Keyword_Model_User();
         $rst = $model->registUser($data);
@@ -81,6 +89,7 @@ class Keyword_UserController extends Zend_Controller_Action
             $this->view->email = $data["email"];
             $this->view->password = $data["password"];
             $this->view->site = $data["site"];
+            $this->view->zero = $data["zero"];
         }
         
         $this->_forward('index');
@@ -104,6 +113,7 @@ class Keyword_UserController extends Zend_Controller_Action
         $data["email"] = $this->getRequest()->updemail;
         $data["password"] = $this->getRequest()->updpassword;
         $data["site"] = $this->getRequest()->site;
+        $data["zero"] = empty($this->getRequest()->updzero) ? 0 : 1;
         
         $model = new Keyword_Model_User();
         $model->updateUser($data, $id);

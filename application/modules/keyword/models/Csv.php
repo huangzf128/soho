@@ -144,10 +144,18 @@ class Keyword_Model_Csv extends Db_Abstract{
 	            'curloptions' => array(CURLOPT_FOLLOWLOCATION => false),
 	    ));
 	    
-	    $api = Com_Const::CSV_SERVER_GOOGLE;
+	    // $api = Com_Const::CSV_SERVER_GOOGLE;
+
+	    $commonapi = array("url" => Com_Const::API_GOOGLE,  "per" => 25);
+	    $coolblog = array("url" => "http://ad8.coolblog.jp/kw/result", "per" => 20);
+	    $core = array("url" => "http://kword.coresv.com/kw/result",  "per" => 20);
+	    $leo = array("url" => "http://www.kword.lrv.jp/result",  "per" => 20);
+	    $x = array("url" => "http://medical-blog.net/kw/result",  "per" => 15);
+	     
+	    $urls = array($commonapi, $coolblog, $core, $leo, $x);
+	    $api = $this->randSelect($urls);
 	    
 	    $expandKeywords = $interruptRst;
-	    
 	    $i = 1;
 	    $count = count($skAry);
 	    $keyRes = array();
@@ -162,33 +170,34 @@ class Keyword_Model_Csv extends Db_Abstract{
 	            continue;
 	        }
 	        
+	        $fp = Com_Util::getLock("csvlock", 60);
 	        
-	        $fp = fopen("log/csvlock", 'a+');
-	        while (!flock ($fp, LOCK_EX)) {
-	            usleep(1000);
-	        }
+	        $posts = array(
+	                'site' => Com_Const::GOOGLE,
+	                'keyword' => urlencode(json_encode($keyRes))
+	        );
 	        
-            $client->setUri($api);
-            $client->setParameterPost('site', Com_Const::GOOGLE);
-            $client->setParameterPost('keyword', urlencode(json_encode($keyRes)));
-            
-            $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE, "POST");
-	         
-	        usleep(500 * 1000);
-	        $this->callApiTimes++;
-	         
-            try {
-                flock($fp, LOCK_UN);
-                fclose($fp);
-            } catch(Exception $e) {
-                fclose($fp);
-            }
+	        try {
+	            if ($api === Com_Const::API_GOOGLE) {
+	                $client->setUri($api.urlencode($keyword));
+	                $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE);
+	            } else {
+	                $client->setUri($api);
+	                $client->setParameterPost($posts);
+	                $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE, "POST");
+	            }
+	            
+	            usleep(400 * 1000);
+	            $this->callApiTimes++;
+	        } catch (Exception $e) {}
 	        
-            usleep(500 * 1000);
+	        Com_Util::releaseLock($fp);
+	        
+            usleep(200 * 1000);
 	        
 	        if (!$response || in_array($response, array(Com_Const::FORBIDDEN, Com_Const::SERVICEUNAVAILABLE, Com_Const::EAPPIDERR)) ) {
 	            
-	        	$otherServerRes = Com_Util::getFromReplaceServer($client, Com_Const::GOOGLE);
+	        	$otherServerRes = Com_Util::getFromReplaceServer($client, $posts, Com_Const::GOOGLE);
 	            if ($otherServerRes == false) {
 	                
 	                Com_Log::registApiErrorLog("game", "over", "0件", mb_convert_encoding($keyword, "shift-jis"), Com_Const::GOOGLE);
@@ -199,33 +208,51 @@ class Keyword_Model_Csv extends Db_Abstract{
 	                $response = $otherServerRes[0];
 	                $api = $otherServerRes[1];
 	            }
-            } 
+            }
             
-            
-            $response = json_decode($response);
+            if ($api !== Com_Const::API_GOOGLE) { 
+                $response = json_decode($response);
+            }
 
-            
             $ri = 0;
             foreach ($keyRes as $gNm => $kword) {
                 
-                if (is_array($response) == false || $response == null) {
+                if ($api === Com_Const::API_GOOGLE) {
+                    if ( $response == null) {
                     
-                    Com_Log::registApiErrorLog("some error", "over", $api, $keyword, Com_Const::GOOGLE);
-                    // some error
-                    // return Com_Const::ERROR;
+                        Com_Log::registApiErrorLog("some error", "over", $api, $keyword, Com_Const::GOOGLE);
+                        // some error
+                        // return Com_Const::ERROR;
+                    } else {
+                        $rstWord = $this->parseXMLResponseCsv($response, $gNm, $kword);
+                         
+                        if (!empty($rstWord)) {
+                            $expandKeywords .= $rstWord;
+                        }
+                    }
                 } else {
-                    $rstWord = $this->parseXMLResponseCsv($response[$ri++], $gNm, $kword);
-                     
-                    if (!empty($rstWord)) {
-                        $expandKeywords .= $rstWord;
+                    if ( is_array($response) == false || $response == null) {
+                    
+                        Com_Log::registApiErrorLog("some error", "over", $api, $keyword, Com_Const::GOOGLE);
+                        // some error
+                        // return Com_Const::ERROR;
+                    } else {
+                        try {
+                            $rstWord = $this->parseXMLResponseCsv($response[$ri++], $gNm, $kword);
+                             
+                            if (!empty($rstWord)) {
+                                $expandKeywords .= $rstWord;
+                            }
+                        } catch (Exception $e) { }
                     }
                 }
+                
             }
 	        
             //Com_Log::registApiErrorLog("time", "time", time(true), $startTime, Com_Const::GOOGLE);
             
 	        if (time(true) - $startTime > Com_Const::EXECUTE_TIME_G 
-	            || $this->callApiTimes++ > 500) {
+	            || $this->callApiTimes > 500) {
 	                
 	            return array(Com_Const::INTERRUPTION, $expandKeywords, $groupNm, $this->callApiTimes);
 	        }
@@ -302,6 +329,17 @@ class Keyword_Model_Csv extends Db_Abstract{
 	// --------------------------------------------------------------
 	// Private Function
 	// --------------------------------------------------------------
+	
+	private function randSelect($array) {
+	    $target = rand(1, 100);
+	    foreach ($array as $val) {
+	        if ($target <= $val['per']) {
+	            return $val["url"];
+	        } else {
+	            $target -= $val['per'];
+	        }
+	    }
+	}
 	
 	private function encode_array($ary) {
 	
