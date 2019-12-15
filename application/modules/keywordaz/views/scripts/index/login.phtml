@@ -1,0 +1,31 @@
+<div id="readtex">
+
+<font size="5">ログイン画面</font><br>
+
+<p id="loginpg">検索結果のキーワードのＣＳＶを３階層まで一括で収集できる有料オプション会員用のページです。<br>
+詳しくは<a href="/csvall.pdf" target="_blank">こちらの詳細ページ</a>をご覧ください。</p>
+
+<form method="post" action="/keywordaz/index/auth">
+
+<div style="width: 410px;color: red;margin: 0px auto -15px;font-size: 12px;">
+<?php echo $this->errormsg;?>
+</div>
+
+<table class="logint">
+<tr>
+	<th>お客様ＩＤ</th>
+	<td><input type="text" name="id" id="id"></td>
+</tr>
+<tr>
+	<th>パスワード</th>
+	<td><input type="password" name="password" id="password"></td>
+</tr>
+</table>
+
+<div class="loginb"><input type="submit" name="login" value="ログイン"></div>
+
+</form>
+
+
+</div>
+

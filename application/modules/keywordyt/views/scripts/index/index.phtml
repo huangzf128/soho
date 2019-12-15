@@ -1,0 +1,52 @@
+<p id="readtex">『ユーチューブサジェスト キーワード一括ＤＬツール』は、YouTubeのサジェスト機能で表示されるキーワード候補を１回の操作で一度に表示させ、ｃｓｖでまとめてダウンロードできるツールです。<br>
+ 検索数が多い最新のキーワード調査や、ホームページのコンテンツ作成時のヒントなどにご利用ください。<br>
+ なお、当社では以下のサジェストツールも運用していますので、あわせてご利用ください。<br />
+<a href="https://www.gskw.net/" target="_blank">グーグルサジェスト</a>・<a href="https://www.yakw.net/" target="_blank">ヤフーサジェスト</a>・<a href="https://www.bskw.net/" target="_blank">ビングサジェスト</a>・<a href="https://www.azkw.net/" target="_blank">アマゾンサジェスト</a></p>
+
+<div id="form" class="clearfix">
+<div id="kakomi1">
+<div id="f_txt">キーワード</div>
+</div>
+<div id="f01">
+<div id="kakomi2">
+
+<form id="keywordFrm" name="form1" method="post" action="<?php echo $this->baseUrl(); ?>result">
+<input id="registflg" type="hidden" name="registflg" value="1">
+<label>
+<input id="keyword" type="text" name="keyword" class="madow" value="<?php echo $this->layout()->keyword; ?>">
+</label>
+</div>
+<input id="but" name="　　検　索　　" type="button" value="　　検　索　　" class="madoww">
+<div id="bloading"></div>
+</form>
+</div>
+
+</div>
+<div class="clear"></div>
+
+<script>
+
+var cook;
+var cStart, cEnd;
+var cnt;
+
+//cookieが使えるか確認
+if (navigator.cookieEnabled)
+{
+  cook = document.cookie;
+  cStart = cook.indexOf("20161128", 0);
+
+  if (cStart == -1)
+  {
+    document.cookie="20161128";  
+    window.location.reload(false);
+  }
+}
+else
+{
+}
+
+</script>
+
+<div id="mark"><p>・キーワードを入力して「検索」ボタンをクリックしてください。<br>
+・候補キーワード表示後「csv取得」ボタンクリックで、csvのダウンロードが可能です。</p></div>

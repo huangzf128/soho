@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta charset="utf-8" />
+<title>検索履歴一覧ページ│ビングサジェスト キーワード一括ＤＬツール</title>
+
+<meta name="description" content="検索ワード候補を一覧表で表示させて、簡単にＣＳＶで一括ダウンロードができる「ビングサジェスト キーワード一括ダウンロードツール」を利用した、検索ワード（キーワード）の検索履歴一覧ページです。他のユーザーがどのようなキーワードで検索したのかがわかります。">
+<meta name="keywords" content="bingサジェスト,キーワード,検索履歴">
+<link rel="stylesheet" href="<?php echo $this->baseUrl(); ?>style.css?ver=1" type="text/css" />
+<meta name="viewport" content="width=device-width, user-scalable=yes, maximum-scale=1.0, minimum-scale=1.0">
+<!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+</head>
+<body>
+<div id="header" class="clearfix"><p>ビングサジェストのキーワード候補をまとめてｃｓｖでダウンロードできるツール</p>
+<div id="fav">
+
+<div id="lefticon1">
+<div class="ninja_onebutton">
+<script type="text/javascript">
+//<![CDATA[
+(function(d){
+if(typeof(window.NINJA_CO_JP_ONETAG_BUTTON_7cdbc259248214903e7148b804109e1b)=='undefined'){
+    document.write("<sc"+"ript type='text\/javascript' src='\/\/omt.shinobi.jp\/b\/7cdbc259248214903e7148b804109e1b'><\/sc"+"ript>");
+}else{
+    window.NINJA_CO_JP_ONETAG_BUTTON_7cdbc259248214903e7148b804109e1b.ONETAGButton_Load();}
+})(document);
+//]]>
+</script><span class="ninja_onebutton_hidden" style="display:none;"></span><span style="display:none;" class="ninja_onebutton_hidden"></span>
+</div>
+</div><!-- lefticon1 -->
+
+<div id="lefticon4">
+<?php 
+    if (Com_Util::isLoggedUser($this->layout()->usertype)) {
+        echo "<a href='/keywordbs/index/logout'>ログアウト</a>";
+    } else {
+        echo "<a href='/keywordbs/index/login'>ログイン</a>";
+    } ?>
+</div><!-- lefticon4 -->
+
+</div><!-- fav -->
+</div>
+
+<div id="wrapper">
+
+<?php if (Com_Util::isLoggedUser($this->layout()->usertype)) {
+        echo '<div style="float:right;color:blue;margin-top:10px;">';
+
+        $username = "こんにちは、<B>".$this->layout()->username."</B>　様　";
+        echo $username;
+
+        echo '<div id="csv-download" >CSV管理</div>';
+        
+        echo '</div>';
+
+} ?>
+
+<a href="../" title="ビングサジェスト キーワード一括ダウンロードツール"><img src="/img/sitelogo.jpg" width="100%"></a>
+<h1><span class="txtclear">ビングサジェスト キーワード一括ＤＬツールbing Suggest Keyword Package Download Tool</span></h1>
+
+<section id="main">
+<section id="content">
+
+
+<?php echo $this->layout()->content; ?>
+
+</section>
+</section>
+
+
+<div id="all-02">
+<!-- admax -->
+<script src="https://adm.shinobi.jp/o/94dabf395814f2dd4e2548929c89f1d1"></script>
+<!-- admax -->
+</div>
+
+
+<footer>
+<section id="footer-area">
+<section id="footer-outer-block" class="clearfix">
+<center>
+<aside class="footer-segment01"><a href="/what/">bingサジェストとは</a></aside>
+<aside class="footer-segment02"><a href="/history/">検索履歴</a></aside>
+<aside class="footer-segment03"><a href="/set/" >当ツールをサイトに設置</a></aside>
+<aside class="footer-segment04"><a href="/link/">リンクについて</a></aside>
+<aside class="footer-segment05"><a href="/prof/">運営者情報</a></aside>
+<aside class="footer-segment06"><a href="/mail/" target="_blank">お問い合わせ</a></aside>
+<aside class="footer-segment07"><a href="/">TOP</a></aside>
+</center>
+</section>
+Copyright (C) 1st-MEDIA,inc. All Rights Reserved.
+</section>
+</footer>
+
+</div>
+
+
+<div id="all-02">
+<!-- admax -->
+<script src="https://adm.shinobi.jp/o/94dabf395814f2dd4e2548929c89f1d1"></script>
+<!-- admax -->
+</div>
+
+
+
+
+<script	src="<?php echo $this->baseUrl(); ?>_library/jquery-1.9.1.js" language="javascript"></script>
+<script	src="<?php echo $this->baseUrl(); ?>_library/jMenu_new.js?ver=1" language="javascript"></script>
+<script	src="<?php echo $this->baseUrl(); ?>_library/spin.min.js" language="javascript"></script>
+<script>
+var clicked = "";
+var opts = {
+		  lines: 7, // The number of lines to draw
+		  length: 5, // The length of each line
+		  width: 5, // The line thickness
+		  radius: 5, // The radius of the inner circle
+		  corners: 0.3, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#000', // #rgb or #rrggbb
+		  speed: 1, // Rounds per second
+		  trail: 60, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: true, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: 'auto', // Top position relative to parent in px
+		  left: 'auto' // Left position relative to parent in px
+		};
+
+var onFrmSubmit = function(){
+	if ( $("#keywordFrm").data("issubmit") != 1 ) {
+
+		$("#but").attr("disabled", true);
+		$("#keywordFrm").data("issubmit", 1);
+			
+		$("#bloading").css("display", "block");
+		var target = document.getElementById('bloading');
+		var spinner = new Spinner(opts).spin(target);	
+	 	return true;
+	}
+ 	return false;
+}
+
+$(function(){
+	
+	$("#but").click(
+		function(){$("#keywordFrm").submit();
+	});
+	
+	$("#keywordFrm").submit(onFrmSubmit);
+	
+	$("#jQ-menu").on("click", ".sugkey", function(){
+	    var keyword = $(this).text();
+	    var child = $(this).next();
+	     
+	    if(child.length > 0) {
+	    	$(this).next().remove();
+	    	return;
+	    } else {
+		    $(this).css("background", "url(<?php echo $this->baseUrl(); ?>img/loading.gif) no-repeat right");
+		    getSuggestKeywordAjax(keyword);		    
+		    clicked = $(this);
+	    }
+	});
+	
+	$(".madoww2").click(function(){		
+		var csvdata = "";
+		$(".til").each(function(){
+			var title = $(this).find("span").text();
+			$(this).next().children("li").each(function(){
+				csvdata = csvdata + title + "," + $.trim($(this).children("span").text()) + "\n";
+			});
+		});	    
+		$("#csvdata").val(csvdata);
+		$("#csvFrm").submit();
+	});	
+
+	$("#pageno").click(function(event){		
+		if ($(event.target).is('a')){
+			
+			var no = $(event.target).find("span").text();
+			if (no == 1) no = "";
+			var action = $("#pfrm").attr('action') + no + ".html";
+			$("#pfrm").attr('action', action); 
+			$("#pfrm").submit();
+		}	
+	});	
+
+	$(".link").click(function(){
+				
+		var id = $(this).next().text();
+		$("#id").val(id);
+		
+		var action = $("#dfrm").attr('action') + $(this).next().next().text() + "_" +$(this).text();
+		$("#dfrm").attr('action', action); 
+		$("#dfrm").submit();
+	});	
+
+	$("#csv-download").click(function(e){
+		window.location.href = "/keywordbs/csv";
+		e.stopPropagation();
+	});
+	
+});
+
+
+function getSuggestKeywordAjax(keyword){
+
+	$.ajax({
+		type: "post",
+		url: "<?php echo $this->baseUrl(); ?>keywordbs/keyword/get-Suggest-Keyword-Ajax",
+		async: true,
+		data:{"keyword" : keyword},
+		success:function(data){
+			var rstNode = $(data);
+			if(rstNode.children().length > 0){
+			    clicked.after(rstNode);
+			}
+		    clicked.css("background-image", "");
+		    clicked = null;
+		}
+	}).responseText;
+}
+
+</script>
+<!-- アクセス解析 -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-25096557-22', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>

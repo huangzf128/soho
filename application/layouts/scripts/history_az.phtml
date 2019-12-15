@@ -1,0 +1,305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<?php
+$pgurl = @$_SERVER["REQUEST_URI"];
+$pathname = explode("?",$pgurl);
+$pathname = explode("/",$pathname[0]);
+$pathname = $pathname[1];
+$debug = strpos($pgurl,"debug=1") . "";
+$spmode = false;
+
+$ua = $_SERVER['HTTP_USER_AGENT'];
+if ((strpos($ua, 'Android') !== false) && (strpos($ua, 'Mobile') !== false) || (strpos($ua, 'iPhone') !== false) || (strpos($ua, 'Windows Phone') !== false)) {
+	$debug = 1;
+}
+
+if ( $debug != "" ) {
+$spmode = true;
+?>
+	<meta name="viewport" content="width=320px,user-scalable=yes">
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<?php } ?>
+<!-- az -->
+
+<meta charset="utf-8" />
+<title>検索履歴一覧ページ│アマゾンサジェスト キーワード一括ＤＬツール</title>
+<meta name="description" content="検索ワード候補を一覧表で表示させて、簡単にＣＳＶで一括ダウンロードができる「アマゾンサジェスト キーワード一括ダウンロードツール」を利用した、検索ワード（キーワード）の検索履歴一覧ページです。他のユーザーがどのようなキーワードで検索したのかがわかります。">
+<meta name="keywords" content="Amazonサジェスト,キーワード,検索履歴">
+<meta name="viewport" content="width=device-width, user-scalable=yes, maximum-scale=1.0, minimum-scale=1.0">
+<link rel="stylesheet" href="<?php echo $this->baseUrl(); ?>_css/styles_az.css?ver=1" type="text/css" />
+<!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-25096557-14', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<div id="header" class="clearfix"><p>アマゾンサジェストのキーワード候補をまとめてｃｓｖでダウンロードできるツール</p>
+<div id="fav">
+
+<div id="lefticon1">
+<div class="ninja_onebutton">
+<script type="text/javascript">
+//<![CDATA[
+(function(d){
+if(typeof(window.NINJA_CO_JP_ONETAG_BUTTON_14c6e7abe6aacc5e9c055784f841aff3)=='undefined'){
+    document.write("<sc"+"ript type='text\/javascript' src='\/\/omt.shinobi.jp\/b\/14c6e7abe6aacc5e9c055784f841aff3'><\/sc"+"ript>");
+}else{
+    window.NINJA_CO_JP_ONETAG_BUTTON_14c6e7abe6aacc5e9c055784f841aff3.ONETAGButton_Load();}
+})(document);
+//]]>
+</script><span class="ninja_onebutton_hidden" style="display:none;"></span><span style="display:none;" class="ninja_onebutton_hidden"></span>
+</div>
+</div><!-- lefticon1 -->
+
+<div id="lefticon4">
+<?php 
+    if (Com_Util::isLoggedUser($this->layout()->usertype)) {
+        echo "<a href='/keywordaz/index/logout'>ログアウト</a>";
+    } else {
+        echo "<a href='/keywordaz/index/login'>ログイン</a>";
+    } ?>
+</div><!-- lefticon4 -->
+
+</div><!-- fav -->
+</div>
+
+<!--<?php echo $pathname; ?>-->
+<?php
+if ( $spmode ) {
+	/* SPのみ広告差し込み */
+	if ( $pathname == "" ) {
+		include '/home/users/2/coolblog.jp-ad8/web/azkw/sp/adscript/index_ad_1.txt';
+	} else if ( $pathname == "history"){
+		include '/home/users/2/coolblog.jp-ad8/web/azkw/sp/adscript/result_ad_1.txt';
+	}
+}
+?>
+
+<div id="wrapper">
+
+<?php if (Com_Util::isLoggedUser($this->layout()->usertype)) {
+        echo '<div style="float:right;color:blue;margin-top:10px;">';
+
+        $username = "こんにちは、<B>".$this->layout()->username."</B>　様　";
+        echo $username;
+
+        echo '<div id="csv-download" >CSV管理</div>';
+        
+        echo '</div>';
+
+} ?>
+
+<a href="../" title="アマゾンサジェスト キーワード一括ダウンロードツール"><img src="/_img_az/sitelogo.jpg" width="100%"></a>
+<h1><span class="txtclear">アマゾンサジェスト キーワード一括ＤＬツールamazon Suggest Keyword Package Download Tool</span></h1>
+<section id="main">
+<section id="content">
+
+
+<?php echo $this->layout()->content; ?>
+
+</section>
+</section>
+
+<?php
+if ( $spmode ) {
+	/* SPのみ広告差し込み */
+	if ( $pathname == "" ) {
+		include '/home/users/2/coolblog.jp-ad8/web/azkw/sp/adscript/index_ad_2.txt';
+	} else if ( $pathname == "history"){
+		include '/home/users/2/coolblog.jp-ad8/web/azkw/sp/adscript/result_ad_2.txt';
+	}
+}
+?>
+
+<footer>
+<section id="footer-area">
+<section id="footer-outer-block" class="clearfix">
+<center>
+<aside class="footer-segment01"><a href="/what/">amazonサジェストとは</a></aside>
+<aside class="footer-segment02"><a href="/history/">検索履歴</a></aside>
+<aside class="footer-segment03"><a href="/set/" >当ツールをサイトに設置</a></aside>
+<aside class="footer-segment04"><a href="/link/">リンクについて</a></aside>
+<aside class="footer-segment05"><a href="/prof/">運営者情報</a></aside>
+<aside class="footer-segment06"><a href="/mail/" target="_blank">お問い合わせ</a></aside>
+<aside class="footer-segment07"><a href="/">TOP</a></aside>
+</center>
+</section>
+Copyright (C) 1st-MEDIA,inc. All Rights Reserved.
+</section>
+</footer>
+
+</div>
+
+
+<!-- ---------------------------バナー  START  (footer down)---------------------------------- -->
+<div id="all-rs">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- アマゾンサジェスト_rwd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="3277696150"
+     data-ad-format="auto"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+
+<div id="all-rs">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- アマゾンサジェスト_リンク広告_rwd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="9519670870"
+     data-ad-format="link"
+     data-full-width-responsive="true"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+<!-- ---------------------------バナー  END  (footer down)---------------------------------- -->
+
+
+<?php
+if ( $spmode ) {
+	/* SPのみ広告差し込み */
+	if ( $pathname == "" ) {
+		include '/home/users/2/coolblog.jp-ad8/web/azkw/sp/adscript/index_ad_3.txt';
+	} else if ( $pathname == "history"){
+		include '/home/users/2/coolblog.jp-ad8/web/azkw/sp/adscript/result_ad_3.txt';
+	}
+} else {
+?>
+
+<script	src="<?php echo $this->baseUrl(); ?>_library/jquery-1.9.1.js" language="javascript"></script>
+<script	src="<?php echo $this->baseUrl(); ?>_library/jMenu.js?ver=1" language="javascript"></script>
+
+<?php } ?>
+
+<script	src="<?php echo $this->baseUrl(); ?>_library/spin.min.js" language="javascript"></script>
+<script>
+var clicked = "";
+var opts = {
+		  lines: 7, // The number of lines to draw
+		  length: 5, // The length of each line
+		  width: 5, // The line thickness
+		  radius: 5, // The radius of the inner circle
+		  corners: 0.3, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#000', // #rgb or #rrggbb
+		  speed: 1, // Rounds per second
+		  trail: 60, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: true, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: 'auto', // Top position relative to parent in px
+		  left: 'auto' // Left position relative to parent in px
+		};
+
+var onFrmSubmit = function(){
+
+	if ( $("#keywordFrm").data("issubmit") != 1 ) {
+
+		$("#but").attr("disabled", true);
+		$("#keywordFrm").data("issubmit", 1);
+		
+		$("#bloading").css("display", "block");
+		var target = document.getElementById('bloading');
+		var spinner = new Spinner(opts).spin(target);	
+	 	return true;
+	}
+ 	return false;
+}
+
+$(function(){
+	
+	$("#but").click(function(){$("#keywordFrm").submit();});
+	$("#keywordFrm").submit(onFrmSubmit);
+	
+	$("#jQ-menu").on("click", ".sugkey", function(){
+	    var keyword = $(this).text();
+	    var child = $(this).next();
+	     
+	    if(child.length > 0) {
+	    	$(this).next().remove();
+	    	return;
+	    } else {
+		    $(this).css("background", "url(<?php echo $this->baseUrl(); ?>_img_az/loading.gif) no-repeat right");
+		    getSuggestKeywordAjax(keyword);		    
+		    clicked = $(this);
+	    }
+	});
+	
+	$(".madoww2").click(function(){		
+		var csvdata = "";
+		$(".til").each(function(){
+			var title = $(this).find("span").text();
+			$(this).next().children("li").each(function(){
+				csvdata = csvdata + title + "," + $.trim($(this).children("span").text()) + "\n";
+			});
+		});	    
+		$("#csvdata").val(csvdata);
+		$("#csvFrm").submit();
+	});	
+
+	$("#pageno").click(function(event){		
+		if ($(event.target).is('a')){
+			
+			var no = $(event.target).find("span").text();
+			if (no == 1) no = "";
+			var action = $("#pfrm").attr('action') + no + ".html";
+			$("#pfrm").attr('action', action); 
+			$("#pfrm").submit();
+		}	
+	});	
+
+	$(".link").click(function(){
+				
+		var id = $(this).next().text();
+		$("#id").val(id);
+		
+		var action = $("#dfrm").attr('action') + $(this).next().next().text() + "_" +$(this).text();
+		$("#dfrm").attr('action', action); 
+		$("#dfrm").submit();
+	});	
+
+	$("#csv-download").click(function(e){
+		window.location.href = "/keywordaz/csv";
+		e.stopPropagation();
+	});
+});
+
+
+function getSuggestKeywordAjax(keyword){
+
+	$.ajax({
+		type: "post",
+		url: "<?php echo $this->baseUrl(); ?>keywordaz/keyword/get-Suggest-Keyword-Ajax",
+		async: true,
+		data:{"keyword" : keyword},
+		success:function(data){
+			var rstNode = $(data);
+			if(rstNode.children().length > 0){
+			    clicked.after(rstNode);
+			}
+		    clicked.css("background-image", "");
+		    clicked = null;
+		}
+	}).responseText;
+}
+
+</script>
+</body>
+</html>

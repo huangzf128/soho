@@ -1,0 +1,3 @@
+﻿<!-- admax -->
+<script src="http://adm.shinobi.jp/s/d237deeb4b52748d1970d35c0f931dc9"></script>
+<!-- admax -->

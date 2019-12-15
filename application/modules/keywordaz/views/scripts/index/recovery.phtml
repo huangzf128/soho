@@ -1,0 +1,19 @@
+<html>
+<head>
+<meta charset="utf-8" />
+<title></title>
+</head>
+<body>
+
+<a href="http://www.ytkw.net/menu.php">管理TOPへ戻る</a><br/>
+<a href="/keywordaz/index/recovery">リカバリーTOPへ戻る</a><br/>
+
+<form action="/keywordaz/index/recovery" method="GET">
+<input type="text" name="start" value="<?php echo $this->start; ?>"/>
+<input type="text" name="end" value="<?php echo $this->end; ?>"/>
+<input type="submit" value="recovery" />
+</form>
+
+<span><?php echo $this->msg;?></span>
+</body>
+</html>

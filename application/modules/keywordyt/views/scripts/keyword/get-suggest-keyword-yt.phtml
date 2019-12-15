@@ -1,0 +1,219 @@
+<p id="readtex">『ユーチューブサジェスト キーワード一括ＤＬツール』は、YouTubeのサジェスト機能で表示されるキーワード候補を１回の操作で一度に表示させ、ｃｓｖでまとめてダウンロードできるツールです。<br>
+検索数が多い最新のキーワード調査や、ホームページのコンテンツ作成時のヒントなどにご利用ください。</p>
+
+<div id="form" class="clearfix">
+<div id="kakomi1">
+<div id="f_txt">キーワード</div>
+</div>
+<div id="f01">
+<div id="kakomi2">
+
+<form id="keywordFrm" name="form" method="post" action="<?php echo $this->baseUrl(); ?>result">
+<input id="registflg" type="hidden" name="registflg" value="1">
+<label>
+<input id="keyword" type="text" name="keyword" class="madow" value="<?php echo $this->layout()->keyword; ?>">
+</label>
+</div>
+<input id="but" name="　　検　索　　" type="button" value="　　検　索　　" class="madoww">
+<div id="bloading"></div>
+</form>
+</div>
+
+</div><div class="clear"></div>
+
+<!--PC用広告表示-->
+<div id="pc-0304">
+<table class="splinkbox">
+<tr><th colspan="2">スポンサードリンク</th></tr>
+<tr>
+<td><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- ユーチューブサジェスト_300x250 -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:250px"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="3180121952"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></td>
+<td><!-- admax -->
+<script src="https://adm.shinobi.jp/s/dcf86080a6cde75bf22d03466d357939"></script>
+<!-- admax --></td>
+</tr>
+</table>
+</div>
+<!--PC用広告表示　ＥＮＤ-->
+
+<!--タブレット用広告表示-->
+<div id="tab-03">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- ユーチューブサジェスト_300x250 -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:250px"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="3180121952"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+<!--タブレット用広告表示　ＥＮＤ-->
+
+<!--スマホ用広告表示-->
+<div id="smp-03">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- ユーチューブサジェスト_300x250 -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:250px"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="3180121952"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+<!--スマホ用広告表示　ＥＮＤ-->
+
+</section>
+
+<!--<div id="pc-09-758">-->
+<p class="all-01">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- ユーチューブサジェスト_リンク広告_rwd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="7723295558"
+     data-ad-format="link"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+<!--</div>-->
+</p>
+<br>
+
+<div id="list">
+
+  <p>検索結果：<?php echo $this->layout()->rstCnt; ?> 件のキーワード候補が見つかりました。</p>
+
+  <?php echo $this->indextab; ?> 
+  
+<p class="aiueobox-txt">
+※上記の青文字をクリックすると、該当のキーワードのブロックにジャンプします。<br/>
+※<img src="/img/add.png" alt="＋" style="vertical-align:top">マークのあるキーワードをクリックすると、さらにサジェスト候補が表示されます。</p>
+
+<br>
+<p><font color="#ED1F27">[PR]</font> <a href="http://www.ad8.co.jp/sks/" onmouseover="color='#0000FF'" onmouseout="color='#111111'" target="_blank">サイトを売るならサイト買取サービスで。相場より高くサイト売買が可能です。</a></p>
+
+
+<p class="all-01">
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-format="autorelaxed"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="7223767952"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- ユーチューブサジェスト_rwd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="9226655555"
+     data-ad-format="auto"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</p>
+
+  
+<form action="<?php echo $this->baseUrl(); ?>keywordyt/keyword/get-Csv-File" method="post" id="csvFrm">
+    <input type="hidden" id="csvdata" name="csvdata" />
+    <input type="hidden" id="historyid" name="historyid" value="<?php echo $this->historyid;?>" />
+    
+    <div class="csv_div">
+
+<?php if ($this->layout()->isValidIp) { ?>
+      	<input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww4 csvprime" style="background-image: url(/img/bt_csv_vip.jpg);">
+<?php } else { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
+<?php } 
+      if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得(予約)　" class="madoww4 csvorder" style="color:white;background-image: url(/img/bt_csv_order.jpg);">
+<?php } ?>
+
+    	<p style="margin-top:10px;"><img src="/img/add.png" alt="＋" style="vertical-align:top"><a href="/csvall.pdf" target="_blank">の下層ワードのcsv取得方法</a></p>
+    </div>
+</form><br/>
+<p>
+<b>キーワード候補一覧</b> （キーワード：<?php echo $this->layout()->keyword; ?>）<br>
+
+<br/><br/>
+
+<div id="jQ-menu">
+    <?php echo $this->sk;?>
+</div>
+
+
+</p>
+
+<div class="csv_div">
+
+<?php if ($this->layout()->isValidIp) { ?>
+      	<input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww4 csvprime" style="background-image: url(/img/bt_csv_vip.jpg);">
+<?php } else { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
+<?php } 
+      if (isset($this->layout()->usertype) && $this->layout()->usertype == 1) { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得(予約)　" class="madoww4 csvorder" style="color:white;background-image: url(/img/bt_csv_order.jpg);">
+<?php } ?>
+
+	<p style="margin-top:10px;"><img src="/img/add.png" alt="＋" style="vertical-align:top"><a href="/csvall.pdf" target="_blank">の下層ワードのcsv取得方法</a></p>
+</div>
+</div>
+
+<div class="tool">
+	<table>
+		<caption>あなたにおススメの「サイト」＆「ツール」をご紹介</caption>
+		<thead>
+			<tr>
+				<th>■SEO関連</th>
+				<th>■キーワード関連</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<ul>
+						<li><a href="http://www.y-seo.net/" target="_blank">1回5000円or月額1000円からの「安いSEO対策サービス」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://www.web-f.net/seoplus/" onClick="return clickCount(130546, 15722);">たった43ページの本物ＳＥＯマニュアル</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://az.ctwpromotion.net/aff-compass/lp/kjag1p798.html" onClick="return clickCount(130546, 65474);">アフィリエイター専用SEO分析ツール「COMPASS」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://www.seo-keni.jp/" onClick="return clickCount(130546, 2058);">SEOに強い戦略的テンプレート「賢威7」</a>
+</li>
+						<li><a href="http://www.seo10.net/" target="_blank">目標順位を選べる成果報酬型「SEOファースト」</a></li>
+					</ul>
+				</td>
+				<td>
+					<ul>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://az.ctwpromotion.net/pandora2/infotop.html" onClick="return clickCount(130546, 63824);">5000本を突破したキーワードツールの決定版「Pandora2」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://zqdle.net/prek/" onClick="return clickCount(130546, 62391);">お宝キーワードの発掘は「プレシャスキーワード」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://keywordstrike.com/" onClick="return clickCount(130546, 62776);">キーワード選定マニュアル「キーワードストライク」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://az.ctwpromotion.net/amc/keyword/top.html" onClick="return clickCount(130546, 60881);">ライバル皆無キーワードを発掘「キーワードスカウターS」</a></li>
+						<li><a href="http://www.kwkt.net/" target="_blank">検索結果をそのまま保存「キーワード検索結果登録ツール」</a></li>
+					</ul>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+

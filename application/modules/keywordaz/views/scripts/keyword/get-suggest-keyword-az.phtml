@@ -1,0 +1,191 @@
+<p id="readtex">『アマゾンサジェスト キーワード一括ＤＬツール』は、amazonのサジェスト機能で表示されるキーワード候補を１回の操作で一度に表示させ、ｃｓｖでまとめてダウンロードできるツールです。<br>
+検索数が多い最新のキーワード調査や、ホームページのコンテンツ作成時のヒントなどにご利用ください。</p>
+<div id="form" class="clearfix"><br>
+<div id="f_txt">キーワード</div>
+
+<div id="f01">
+
+<?php
+$pgurl = @$_SERVER["REQUEST_URI"];
+$pathname = explode("?",$pgurl);
+$pathname = explode("/",$pathname[0]);
+$pathname = $pathname[1];
+$debug = strpos($pgurl,"debug=1") . "";
+
+$ua = $_SERVER['HTTP_USER_AGENT'];
+if ((strpos($ua, 'Android') !== false) && (strpos($ua, 'Mobile') !== false) || (strpos($ua, 'iPhone') !== false) || (strpos($ua, 'Windows Phone') !== false)) {
+	$debug = 1;
+}
+
+$spmode = false;
+if ( $debug != "" ) {
+	$spmode = true;
+} ?>
+
+
+<form id="keywordFrm" name="form" method="post" action="<?php echo $this->baseUrl(); ?>result">
+<input id="registflg" type="hidden" name="registflg" value="1">
+<label>
+<input id="keyword" type="text" name="keyword" class="madow" value="<?php echo $this->layout()->keyword; ?>">
+</label>
+<input id="but" name="　　検　索　　" type="button" value="　　検　索　　" class="madoww">
+<div id="bloading"></div>
+</form>
+</div>
+
+</div><div class="clear"></div>
+
+<br>
+
+<?php
+if ( $spmode ) {
+	/* SPのみ広告差し込み */
+	if ( $pathname == "" ) {
+	} else if ( $pathname == "result"){
+		include '/home/users/2/coolblog.jp-ad8/web/azkw/sp/adscript/result_ad_a.txt';
+	}
+}
+?>
+
+<!-- --------------------------- バナー  START (search button) ---------------------------------- -->
+
+<table class="vici">
+  <tr>
+    <th colspan="2">スポンサードリンク</th>
+    </tr>
+  <tr>
+    <td><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- アマゾンサジェスト_336x280_t -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:336px;height:280px"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="2748713555"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</td>
+    <td><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- アマゾンサジェスト_336x280_i -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:336px;height:280px"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="4085845951"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></td>
+  </tr>
+</table>
+
+
+<div class="all-01">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- アマゾンサジェスト_リンク広告_rwd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="9519670870"
+     data-ad-format="link"
+     data-full-width-responsive="true"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+
+<!-- ---------------------------バナー   END (search button) ---------------------------------- -->
+
+
+<div id="list">
+
+  <p>検索結果：<?php echo $this->layout()->rstCnt; ?> 件のキーワード候補が見つかりました。</p>
+
+  <?php echo $this->indextab; ?> 
+  
+※上記の青文字をクリックすると、該当のキーワードのブロックにジャンプします。<br/>  
+※<img src="/_img_az/add.png" alt="＋" style="vertical-align:top">マークのあるキーワードをクリックすると、さらにサジェスト候補が表示されます。
+<br/><br/>
+
+
+<p class="all-01">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- アマゾンサジェスト_関連コンテンツ_rwd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-format="autorelaxed"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="2635634330"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- アマゾンサジェスト_rwd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="3277696150"
+     data-ad-format="auto"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</p>
+
+<p><font color="#ED1F27">[PR]</font> <a href="https://www.ad8.co.jp/sks/" onmouseover="color='#0000FF'" onmouseout="color='#111111'" target="_blank">サイト売買の『サイト買取サービス』。あなたのサイトを無料査定いたします。</a></p>
+<br>
+
+<?php
+if ( $spmode ) {
+	/* SPのみ広告差し込み */
+	if ( $pathname == "" ) {
+	} else if ( $pathname == "result"){
+		include '/home/users/2/coolblog.jp-ad8/web/azkw/sp/adscript/result_ad_b.txt';
+	}
+}
+?>
+
+
+<form action="<?php echo $this->baseUrl(); ?>keywordaz/keyword/get-Csv-File" method="post" id="csvFrm">
+    <input type="hidden" id="csvdata" name="csvdata" />
+    <input type="hidden" id="historyid" name="historyid" value="<?php echo $this->historyid;?>" />
+    
+    <div class="csv_div">
+    
+<?php if ($this->layout()->isValidIp) { ?>
+      	<input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww4 csvprime" style="background-image: url(/_img_az/bt_csv_vip.jpg);">
+<?php } else { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
+<?php } 
+      if (Com_Util::isLoggedUser($this->layout()->usertype)) { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得(予約)　" class="madoww4 csvorder" style="color:white;background-image: url(/_img_az/bt_csv_order.jpg);">
+<?php } ?>
+
+    	<p style="margin-top:10px;"><img src="/_img_az/add.png" alt="＋" style="vertical-align:top"><a href="/csvall.pdf" target="_blank">の下層ワードのcsv取得方法</a></p>
+    </div>
+</form><br/>
+<p>
+<b>キーワード候補一覧</b> （キーワード：<?php echo $this->layout()->keyword; ?>）<br>
+
+<br/><br/>
+
+<div id="jQ-menu">
+    <?php echo $this->sk;?>
+</div>
+
+
+</p>
+
+<div class="csv_div">
+<?php if ($this->layout()->isValidIp) { ?>
+      	<input name="　　検　索　　2" type="button" value="　csv取得(all)　" class="madoww4 csvprime" style="background-image: url(/_img_az/bt_csv_vip.jpg);">
+<?php } else { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得　" class="madoww2 csvfree">
+<?php } 
+      if (Com_Util::isLoggedUser($this->layout()->usertype)) { ?>
+		<input name="　　検　索　　2" type="button" value="　csv取得(予約)　" class="madoww4 csvorder" style="color:white;background-image: url(/_img_az/bt_csv_order.jpg);">
+<?php } ?>
+
+	<p style="margin-top:10px;"><img src="/_img_az/add.png" alt="＋" style="vertical-align:top"><a href="/csvall.pdf" target="_blank">の下層ワードのcsv取得方法</a></p>
+</div>
+</div>
+

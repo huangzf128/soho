@@ -1,0 +1,433 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta charset="utf-8" />
+<title><?php echo $this->layout()->keyword; ?>│Yahooサジェスト検索結果履歴│<?php echo $this->layout()->date; ?></title>
+<meta name="description" content="「Yahooサジェスト キーワード一括ダウンロードツール」を使用して検索した検索ワード（キーワード）の履歴を紹介しているページです。検索ワード：「<?php echo $this->layout()->keyword; ?>」、調査時刻（年月日時分秒）：「<?php echo $this->layout()->date; ?>」">
+<meta name="keywords" content="<?php echo $this->layout()->keyword; ?>,Yahooサジェスト,検索,履歴,<?php echo $this->layout()->date; ?>">
+
+<link rel="stylesheet" href="<?php echo $this->baseUrl(); ?>style.css?ver=1" type="text/css" />
+<meta name="viewport" content="width=device-width, user-scalable=yes, maximum-scale=1.0, minimum-scale=1.0">
+<!--[if IE]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-25096557-21', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+<style type="text/css">
+	.tool {
+		width: 85%;
+		margin: 20px auto 10px;
+		border-collapse: collapse;
+		font-size: 90%;
+		line-height: 1.6em;
+		border: 1px solid #0167CC;
+		border-radius: 5px;
+	}
+	.tool ul {
+		margin-top: 0px;
+		padding-left: 20px;
+		list-style: none;
+	}
+	.tool caption {
+		padding-top: 10px;
+		padding-bottom: 10px;
+		font-weight: bold;
+		line-height: 1.5em;
+		color: #000;
+		background-color: #FEE299;
+		border-bottom: 1px solid #0167CC;
+		border-radius: 5px 5px 0 0;
+	}
+	.tool th {
+		width: 395px;
+		padding-top: 10px;
+		text-align: left;
+		padding-left: 20px;
+	}
+	.tool td {
+		padding-top: 0px;
+		padding-bottom: 10px;
+	}
+	.tool a {
+		text-decoration: none;
+	}
+/*---toolレスポンシブ----*/
+@media (min-width:481px) and (max-width:800px){
+	.tool th {
+		width: 50%;
+	}
+	.tool td {
+		width: 50%;
+	}
+}
+@media (max-width : 480px){
+	.tool {
+		width: 90%;
+	}
+	.tool th {
+		width: 50%;
+	}	
+}
+</style>
+</head>
+<body>
+<div id="header" class="clearfix"><p>ヤフーサジェストのキーワード候補をまとめてｃｓｖでダウンロードできるツール</p>
+<div id="fav">
+
+<div id="lefticon1">
+<div class="ninja_onebutton">
+<script type="text/javascript">
+//<![CDATA[
+(function(d){
+if(typeof(window.NINJA_CO_JP_ONETAG_BUTTON_4a0863803888ee80f80224e6a7088992)=='undefined'){
+    document.write("<sc"+"ript type='text\/javascript' src='\/\/omt.shinobi.jp\/b\/4a0863803888ee80f80224e6a7088992'><\/sc"+"ript>");
+}else{
+    window.NINJA_CO_JP_ONETAG_BUTTON_4a0863803888ee80f80224e6a7088992.ONETAGButton_Load();}
+})(document);
+//]]>
+</script><span class="ninja_onebutton_hidden" style="display:none;"></span><span style="display:none;" class="ninja_onebutton_hidden"></span>
+</div>
+</div><!-- lefticon1 -->
+
+<div id="lefticon4">
+<?php 
+    if (Com_Util::isLoggedUser($this->layout()->usertype)) {
+        echo "<a href='/keywordya/index/logout'>ログアウト</a>";
+    } else {
+        echo "<a href='/keywordya/index/login'>ログイン</a>";
+    } ?>
+</div><!-- lefticon4 -->
+
+</div><!-- fav -->
+</div>
+
+
+<div id="wrapper">
+
+<?php if (Com_Util::isLoggedUser($this->layout()->usertype)) { 
+        echo '<div style="float:right;color:blue;margin-top:10px;">';
+
+        $username = "こんにちは、<B>".$this->layout()->username."</B>　様　";
+        echo $username;
+
+        echo '<div id="csv-download" >CSV管理</div>';
+        
+        echo '</div>';
+
+} ?>
+
+<a href="/" title="ヤフーサジェスト キーワード一括ダウンロードツール"><img src="<?php echo $this->baseUrl(); ?>img/sitelogo.jpg" width="100%"></a>
+<h1><span class="txtclear">ヤフーサジェスト キーワード一括ＤＬツールYahoo Suggest Keyword Package Download Tool</span></h1>
+
+<div id="smp-07-320">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- ヤフーサジェスト_320ｘ100_sp -->
+<ins class="adsbygoogle"
+style="display:inline-block;width:320px;height:100px"
+data-ad-client="ca-pub-0338168428759491"
+data-ad-slot="2949036752"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+
+<section id="main">
+<section id="content">
+
+
+
+<?php echo $this->layout()->content; ?>
+
+</section>
+
+<div id="pc-12-admax">
+<!-- admax -->
+<script src="http://adm.shinobi.jp/s/088d2f70cd83dc833b04efa0d9350ad5"></script>
+<!-- admax -->
+</div>
+
+<div id="tab-06">
+<!-- admax -->
+<script src="http://adm.shinobi.jp/s/c5596c7b4daa5fbdafa2257fe2537eaa"></script>
+<!-- admax -->
+</div>
+
+<div id="smp-08">
+<!-- admax -->
+<script src="http://adm.shinobi.jp/s/7c5c5f2591df6feb1ad6ca1a0db7c6a2"></script>
+<!-- admax -->
+</div>
+
+
+</section>
+
+<div class="tool">
+	<table>
+		<caption>あなたにおススメの「サイト」＆「ツール」をご紹介</caption>
+		<thead>
+			<tr>
+				<th>■SEO関連</th>
+				<th>■キーワード関連</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<ul>
+						<li><a href="http://www.y-seo.net/" target="_blank">1回5000円or月額1000円からの「安いSEO対策サービス」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://www.web-f.net/seoplus/" onClick="return clickCount(130546, 15722);">たった43ページの本物ＳＥＯマニュアル</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://az.ctwpromotion.net/aff-compass/lp/kjag1p798.html" onClick="return clickCount(130546, 65474);">アフィリエイター専用SEO分析ツール「COMPASS」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://www.seo-keni.jp/" onClick="return clickCount(130546, 2058);">SEOに強い戦略的テンプレート「賢威7」</a>
+</li>
+						<li><a href="http://www.seo10.net/" target="_blank">目標順位を選べる成果報酬型「SEOファースト」</a></li>
+					</ul>
+				</td>
+				<td>
+					<ul>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://az.ctwpromotion.net/pandora2/infotop.html" onClick="return clickCount(130546, 63824);">5000本を突破したキーワードツールの決定版「Pandora2」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://zqdle.net/prek/" onClick="return clickCount(130546, 62391);">お宝キーワードの発掘は「プレシャスキーワード」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://keywordstrike.com/" onClick="return clickCount(130546, 62776);">キーワード選定マニュアル「キーワードストライク」</a></li>
+						<li><script type="text/javascript" src="http://www.infotop.jp/click.js"></script>
+<a href="http://az.ctwpromotion.net/amc/keyword/top.html" onClick="return clickCount(130546, 60881);">ライバル皆無キーワードを発掘「キーワードスカウターS」</a></li>
+						<li><a href="http://www.kwkt.net/" target="_blank">検索結果をそのまま保存「キーワード検索結果登録ツール」</a></li>
+					</ul>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+
+<footer>
+<section id="footer-area">
+<section id="footer-outer-block" class="clearfix">
+<aside class="footer-segment01"><a href="/what/">Yahooサジェストとは</a></aside>
+<aside class="footer-segment02"><a href="/history/">検索履歴</a></aside>
+<aside class="footer-segment03"><a href="/set/" >当ツールをサイトに設置</a></aside>
+<aside class="footer-segment04"><a href="/link/">リンクについて</a></aside>
+<aside class="footer-segment05"><a href="/prof/">運営者情報</a></aside>
+<aside class="footer-segment06"><a href="/mail/" target="_blank">お問い合わせ</a></aside>
+<aside class="footer-segment07"><a href="../">TOP</a></aside>
+</section>
+Copyright (C) 1st-MEDIA,inc. All Rights Reserved.
+</section>
+</footer>
+
+</div>
+
+<!-- footerdown banner start -->
+<!-- 最下部広告１段目 -->
+<div id="pc-12-admax">
+<!-- admax -->
+<script src="http://adm.shinobi.jp/s/088d2f70cd83dc833b04efa0d9350ad5"></script>
+<!-- admax -->
+</div>
+
+<div id="tab-13-rakuten">
+<!-- Rakuten Widget FROM HERE --><script type="text/javascript">rakuten_design="slide";rakuten_affiliateId="0db2b8b7.9e24b860.0e37ebb6.52ef4894";rakuten_items="ctsmatch";rakuten_genreId=0;rakuten_size="468x60";rakuten_target="_blank";rakuten_theme="gray";rakuten_border="on";rakuten_auto_mode="off";rakuten_genre_title="off";rakuten_recommend="on";</script><script type="text/javascript" src="http://xml.affiliate.rakuten.co.jp/widget/js/rakuten_widget.js"></script><!-- Rakuten Widget TO HERE -->
+</div>
+
+<div id="smp-04">
+<!-- admax -->
+<script src="http://adm.shinobi.jp/s/2c73bee4f73108856da0322c90745626"></script>
+<!-- admax -->
+</div>
+<!-- 最下部広告１段目 ＥＮＤ-->
+
+<!-- 最下部広告２段目 -->
+<!--2段目 レスポンシブ広告-->
+<div id="all-rs">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- ヤフーサジェスト_リンク広告_rwd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-0338168428759491"
+     data-ad-slot="6214378352"
+     data-ad-format="link"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+<!-- 最下部広告２段目 ＥＮＤ-->
+
+<!-- footerdown banner end -->
+
+
+
+<script	src="<?php echo $this->baseUrl(); ?>_library/jquery-1.9.1.js" language="javascript"></script>
+<script	src="<?php echo $this->baseUrl(); ?>_library/jMenu.js?ver=1" language="javascript"></script>
+<script	src="<?php echo $this->baseUrl(); ?>_library/spin.min.js" language="javascript"></script>
+<script>
+var clicked = "";
+var opts = {
+		  lines: 7, // The number of lines to draw
+		  length: 5, // The length of each line
+		  width: 5, // The line thickness
+		  radius: 5, // The radius of the inner circle
+		  corners: 0.3, // Corner roundness (0..1)
+		  rotate: 0, // The rotation offset
+		  direction: 1, // 1: clockwise, -1: counterclockwise
+		  color: '#000', // #rgb or #rrggbb
+		  speed: 1, // Rounds per second
+		  trail: 60, // Afterglow percentage
+		  shadow: false, // Whether to render a shadow
+		  hwaccel: true, // Whether to use hardware acceleration
+		  className: 'spinner', // The CSS class to assign to the spinner
+		  zIndex: 2e9, // The z-index (defaults to 2000000000)
+		  top: 'auto', // Top position relative to parent in px
+		  left: 'auto' // Left position relative to parent in px
+		};
+
+var onFrmSubmit = function(){
+
+	if ( $("#keywordFrm").data("issubmit") != 1 ) {
+
+		$("#but").attr("disabled", true);
+		$("#keywordFrm").data("issubmit", 1);
+		
+		$("#bloading").css("display", "block");
+		var target = document.getElementById('bloading');
+		var spinner = new Spinner(opts).spin(target);	
+	 	return true;
+	}
+ 	return false;
+}
+
+$(function(){
+	
+	$("#but").click(function(){$("#keywordFrm").submit();});
+	$("#keywordFrm").submit(onFrmSubmit);
+	
+	$("#jQ-menu").on("click", ".sugkey", function(){
+	    var keyword = $(this).text();
+	    var child = $(this).next();
+	     
+	    if(child.length > 0) {
+	    	$(this).next().remove();
+	    	return;
+	    } else {
+		    $(this).css("background", "url(<?php echo $this->baseUrl(); ?>img/loading.gif) no-repeat right");
+		    getSuggestKeywordAjax(keyword);		    
+		    clicked = $(this);
+	    }
+	});
+	
+	$(".csvfree").click(function(){
+		
+		var csvdata = "";
+		$(".til").each(function(){
+			var title = $(this).find("span").text();
+			$(this).next().children("li").each(function(){
+				csvdata = csvdata + title + "," + $.trim($(this).children("span").text()) + "\n";
+			});
+		});	    
+		$("#csvdata").val(csvdata);
+		$("#csvFrm").submit();
+	});	
+
+	$(".csvprime").click(function(){
+		
+		var csvdata = "";
+		$(".til").each(function(){
+			var title = $(this).find("span").text();
+			$ul = $(this).next('ul:eq(0)');
+			if ($ul.length > 0 ) {
+				csvdata += makeCsv(title, $ul);
+			}
+		});	    
+		$("#csvdata").val(csvdata);
+		$("#csvFrm").submit();
+	});	
+
+	// csv 予約（ログイン会員）
+	$(".csvorder").click(function(){
+		$.ajax({
+			type: "post",
+			url: "/keywordya/csv/csv-File-Order",
+			async: false,
+			data:{"historyid" : $("#historyid").val()},
+			success:function(data) {
+				if (data == 1) {
+					alert("予約しました。");
+				} else if(data == 2) {
+					alert("一度に登録できるキーワードは10個までです。");
+				} else {
+					alert("予約が失敗しました。");
+				}
+			}
+		}).responseText;
+	});	
+	
+	function expandResult(historyid) {
+		$.ajax({
+			type: "get",
+			url: "/keywordya/csv/expand-Result-Ajax",
+			async: true,
+			data:{"historyid": historyid},
+			success:function() {
+			},
+			error: function() {
+			}
+		}).responseText;	
+	}
+	
+	function makeCsv(path, $ul) {
+		csv = '';
+		$ul.children("li").each(function(){
+			subpath = "";
+			$(this).children().each(function(){
+				if ($(this).prop("tagName") == "SPAN") {
+					 
+					subpath = $.trim($(this).text());
+					csv += (path + "," + subpath + "\n");
+					
+				} else if ($(this).prop("tagName") == "UL") {
+					
+					csv += makeCsv(path + "," + subpath, $(this));
+				}
+			});
+		});
+		return csv;
+	}
+	
+	$("#csv-download").click(function(e){
+		window.location.href = "/keywordya/csv";
+		e.stopPropagation();
+	});
+	
+});
+
+function getSuggestKeywordAjax(keyword){
+
+	$.ajax({
+		type: "post",
+		url: "<?php echo $this->baseUrl(); ?>keywordya/keyword/get-Suggest-Keyword-Ajax",
+		async: true,
+		data:{"keyword" : keyword},
+		success:function(data){
+			var rstNode = $(data);
+			if(rstNode.children().length > 0){
+			    clicked.after(rstNode);
+			}
+		    clicked.css("background-image", "");
+		    clicked = null;
+		}
+	}).responseText;
+}
+
+</script>
+</body>
+</html>
