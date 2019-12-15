@@ -79,5 +79,86 @@ class Keyword_IndexController extends Zend_Controller_Action
         
         $this->_helper->viewRenderer->setRender('index');
     }
+    
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // maintenance
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    public function removeDuplicateAction() {
+        set_time_limit(0);
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+    
+        $idFrom = $this->getRequest()->idfrom;
+        $idTo = $this->getRequest()->idto;
+    
+        $model = new Keyword_Model_SuggestKeyword(null);
+        $model->delDuplicate($idFrom, $idTo);
+        echo "finish";
+    }
+    
+    public function removeZeroAction() {
+        set_time_limit(0);
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+    
+        $strDate = $this->getRequest()->strDate;
+        $model = new Keyword_Model_SuggestKeyword(null);
+        $model->delSearchHistoryZero($strDate);
+        echo "finish";
+    }
+    
+    // --------------- backup csv --------------------
+    
+    public function saveCsvAction(){
+        set_time_limit(0);
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+    
+        $idFrom = $this->getRequest()->idfrom;
+        $idTo = $this->getRequest()->idto;
+    
+        $model = new Keyword_Model_SuggestKeyword(null);
+        $model->saveToCsv($idFrom, $idTo);
+        echo "finish";
+    }
+    
+    public function saveDbAction(){
+        set_time_limit(0);
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+    
+        $folder = $this->getRequest()->folder;
+        $filenum = $this->getRequest()->filenum;
+        
+        $model = new Keyword_Model_SuggestKeyword(null);
+        $model->csvToDB($folder, $filenum);
+        echo "finish";
+    }
+    
+    public function compressDbAction() {
+        set_time_limit(0);
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+
+        $model = new Keyword_Model_SuggestKeyword(null);
+        //$model->compressDb();
+        echo "finish";
+    }
+    
+    public function compressCsvAction() {
+        set_time_limit(0);
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        
+        $idFrom = $this->getRequest()->idfrom;
+        $idTo = $this->getRequest()->idto;
+        
+        $model = new Keyword_Model_Csv(null);
+        $model->compressCsv($idFrom, $idTo);
+        echo "finish";
+    }
 }
 

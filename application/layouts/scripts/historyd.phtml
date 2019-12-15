@@ -327,10 +327,18 @@ var opts = {
 		};
 
 var onFrmSubmit = function(){
-	$("#bloading").css("display", "block");
-	var target = document.getElementById('bloading');
-	var spinner = new Spinner(opts).spin(target);	
- 	return true;
+
+	if ( $("#keywordFrm").data("issubmit") != 1 ) {
+
+		$("#but").attr("disabled", true);
+		$("#keywordFrm").data("issubmit", 1);
+			
+		$("#bloading").css("display", "block");
+		var target = document.getElementById('bloading');
+		var spinner = new Spinner(opts).spin(target);	
+	 	return true;
+	}
+	return false;	
 }
 
 $(function(){
@@ -390,7 +398,13 @@ $(function(){
 			async: false,
 			data:{"historyid" : $("#historyid").val()},
 			success:function(data) {
-				alert("予約しました。");
+				if (data == 1) {
+					alert("予約しました。");
+				} else if(data == 2) {
+					alert("一度に登録できるキーワードは10個までです。");
+				} else {
+					alert("予約が失敗しました。");
+				}
 			}
 		}).responseText;
 	});	

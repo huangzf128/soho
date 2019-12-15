@@ -40,7 +40,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
         $model = new Keyword_Model_SuggestKeyword($keyword);
         set_time_limit(60);
         
-        if(!$this->accessLimitCheck()){
+        if(!$this->accessLimitCheck() || $model->isBlockIp()){
         	$this->_helper->layout->assign('keyword', $keyword);
         	$this->_helper->layout->assign('rstCnt', $model->getRstCnt());
         	$this->view->sk = "<font color='red'>アクセス制限のため、しばらく経ってから、検索してください。</font><br/><br/><br/>";
@@ -49,7 +49,20 @@ class Keyword_KeywordController extends Zend_Controller_Action
         	return ;
         }
 
-		// keyword check, block check
+        // block check
+        if($model->isBlockKeyword($keyword)){
+        
+            $this->_helper->layout->assign('keyword', $keyword);
+            $this->_helper->layout->assign('rstCnt', $model->getRstCnt());
+            $this->view->sk = "<font color='red'>入力されたキーワードは、当ツールでは対象外です。</font><br/><br/><br/>";
+            $this->view->indextab = "";
+            $this->_helper->layout->setLayout('layout');
+             
+            return;
+        }
+        
+        // ================  check ========================
+		// keyword check
 		$checkResult = $model->checkKeyword();
        	if(1 === $checkResult) {
             $this->_helper->layout->assign('keyword', $keyword);
@@ -62,31 +75,27 @@ class Keyword_KeywordController extends Zend_Controller_Action
         	$this->_response->setRedirect('/index')->sendResponse();
         	return;
         }
-		        
-        if($model->isBlockKeyword()){
 
-	        $this->_helper->layout->assign('keyword', $keyword);
-	        $this->_helper->layout->assign('rstCnt', $model->getRstCnt());
-	        $this->view->sk = "<font color='red'>入力されたキーワードは、当ツールでは対象外です。</font><br/><br/><br/>";
-	        $this->view->indextab = "";
-        	$this->_helper->layout->setLayout('layout');
-	        
-        	return;
-		}
+		// ==================================================
 		
 		$this->_helper->layout->setLayout('historyd');
 		$layout = $this->_helper->layout->getLayoutInstance();
 		
-		// recent keyword
+		// -------------------- recent keyword ---------------------
 		$recentRst = $model->getRecentKeyword();
 		if ($recentRst) {
 		    $layout->assign('keyword', $recentRst["kword"]);
 		    $layout->assign('rstCnt', $recentRst["rstcnt"]);
-		    $this->view->sk = $recentRst["sk"];  // 検索結果
-		    $this->view->indextab = $recentRst["indextab"];      // 索引
-		    
+		    if ($recentRst["bflag"] == 0) {
+		        $this->view->sk = $recentRst["sk"];  // 検索結果
+		        $this->view->indextab = $recentRst["indextab"];      // 索引
+		    } else {
+		        $this->view->sk = gzuncompress($recentRst["skb"]);  // 検索結果
+		        $this->view->indextab = gzuncompress($recentRst["indextabb"]);      // 索引
+		    }
 		    return;
 		}
+		// --------------------------------------------------------
 		
 		if (Com_Util::isZeroServiceEnabled(Com_Const::SERVICE_ZERO_G)) {
 		    // 有料
@@ -171,6 +180,7 @@ class Keyword_KeywordController extends Zend_Controller_Action
 
         $this->view->pageno = $pageNo;
         $this->view->rlist = $result;
+        $this->view->usertype = $this->_helper->layout()->usertype;
     }
     
     
@@ -206,9 +216,15 @@ class Keyword_KeywordController extends Zend_Controller_Action
             
                 $layout->assign('keyword', $result['kword']);
                 $layout->assign('rstCnt', $result['rstcnt']);
-                $this->view->sk = $result['sk'];
-                $this->view->indextab = $result['indextab'];
                 $this->view->historyid = $result['id'];
+                
+                if ($result["bflag"] == 0) {
+                    $this->view->sk = $result['sk'];
+                    $this->view->indextab = $result['indextab'];
+                } else {
+                    $this->view->sk = gzuncompress($result['skb']);
+                    $this->view->indextab = gzuncompress($result['indextabb']);
+                }
             
                 // change phtml name
                 $this->_helper->viewRenderer->setRender('get-suggest-keyword');
@@ -303,4 +319,5 @@ class Keyword_KeywordController extends Zend_Controller_Action
     	//Zend_Session::writeClose();
     	return $rst;
     }
+    
 }

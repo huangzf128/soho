@@ -12,19 +12,35 @@ class Keyword_Model_Csv extends Db_Abstract{
         $data["updatedt"] = date('Y-m-d H:i:s');
         $data["site"] = Com_Const::GOOGLE;
         
-        $dao = new Keyword_Model_Entities_CsvOrderUser();
+        $dao = new Db_CsvOrderUser();
         return $dao->regist($data);
     }
     
     // 予約したCSVを取得する
     public function getCsvOrderList($userid) {
-        $dao = new Keyword_Model_Entities_CsvOrderUser();
+        $dao = new Db_CsvOrderUser();
         $orders = $dao->getCsvOrderList($userid, Com_Const::GOOGLE);
+        
+        foreach($orders as $row) {
+            if ($row['registdt'] == null && $row['kword'] == null) {
+                try {
+                    $result = gzuncompress($row["resultb"]);
+                    
+                    if ($result != null) {
+                        $posS = strpos($result, "<") + 1;
+                        $posE = strpos($result, ">");
+                        
+                        $row['kword'] = substr($result, $posS, $posE - $posS);
+                    }
+                } catch(Exception $e) { }
+                
+            }
+        }
         return $orders;
     }
     
     public function getNotExecuteCsvId($usreid) {
-        $dao = new Keyword_Model_Entities_CsvOrderUser();
+        $dao = new Db_CsvOrderUser();
         $rows = $dao->getNotExecuteCsv($usreid, Com_Const::GOOGLE);
         if (count($rows)) {
             return $rows[0]["historyid"];
@@ -33,9 +49,15 @@ class Keyword_Model_Csv extends Db_Abstract{
         }
     }
     
+    public function getWaitingCount($usreid) {
+        $dao = new Db_CsvOrderUser();
+        $rows = $dao->getNotExecuteCsv($usreid, Com_Const::GOOGLE);
+        return count($rows);
+    }
+    
     // 実行中の処理があるか
     public function hasExecutingCsv($userid) {
-        $dao = new Keyword_Model_Entities_CsvOrderUser();
+        $dao = new Db_CsvOrderUser();
         $rows = $dao->getExecutingCsv($userid, Com_Const::GOOGLE);
         if (count($rows) == 0) {
             return false;
@@ -50,31 +72,37 @@ class Keyword_Model_Csv extends Db_Abstract{
         $result = $searchHistoryEntity->getRowById($historyid);
         
         // タグはずす
-        $skStr = $this->removeSkTag($result["sk"]);
+        if ($result["bflag"] == 0) {
+            $skStr = $this->removeSkTag($result["sk"]);
+        } else {
+            $skStr = $this->removeSkTag(gzuncompress($result["skb"]));
+        }
         
-        $expandDao = new Keyword_Model_Entities_ExpandResult();
+        $expandDao = new Db_ExpandResult();
         $data = array();
         $data["historyid"] = $historyid;
-        $data["result"] = $skStr;
+        //$data["result"] = $skStr;
+        $data["resultb"] = gzcompress($skStr, 9);
         $data["updatedt"] = date('Y-m-d H:i:s');
         $data["status"] = 0;
         $data["site"] = Com_Const::GOOGLE;
         $data["interruptinfo"] = "0--0";
         
-        $rst = $expandDao->regist($data);
+        $rst = $expandDao->registb($data);
         
     	return $rst;
 	}
 	
 	public function updateExpandLevel($historyid, $expandKeywords, $level, $interruptinfo)
 	{
-	    $dao = new Keyword_Model_Entities_ExpandResult();
+	    $dao = new Db_ExpandResult();
 	    
 	    $data = array();
-	    $data["level".$level] = $expandKeywords;
+	    //$data["level".$level] = $expandKeywords;
+	    $data["level".$level."b"] = gzcompress($expandKeywords, 9);
 	    $data["updatedt"] = date('Y-m-d H:i:s');
 	    $data["interruptinfo"] = $interruptinfo;
-	    
+	     
 	    $where = array();
 	    $where["historyid = ?"] = $historyid;
 	    $where["site = ?"] = Com_Const::GOOGLE;
@@ -85,7 +113,7 @@ class Keyword_Model_Csv extends Db_Abstract{
 	}
 	
 	public function updateExpandRand($historyid, $interruptinfo) {
-	    $dao = new Keyword_Model_Entities_ExpandResult();
+	    $dao = new Db_ExpandResult();
 	    
 	    $data = array();
 	    $data["updatedt"] = date('Y-m-d H:i:s');
@@ -100,22 +128,22 @@ class Keyword_Model_Csv extends Db_Abstract{
 	}
 	
 	public function getExpandResult($historyid){
-	    $dao = new Keyword_Model_Entities_ExpandResult();
+	    $dao = new Db_ExpandResult();
 	    $row = $dao->getRowById($historyid, Com_Const::GOOGLE);
 	    return $row;
 	}
 	
 	public function deleteOrderCsv($historyid, $userid) {
-	    $dao = new Keyword_Model_Entities_CsvOrderUser();
+	    $dao = new Db_CsvOrderUser();
         $dao->deleteOne($historyid, $userid, Com_Const::GOOGLE);
         
-        $dao = new Keyword_Model_Entities_ExpandResult();
+        $dao = new Db_ExpandResult();
         $dao->deleteOne($historyid, Com_Const::GOOGLE);
 	}
 	
 	public function updateExpandStatus($historyid, $status)
 	{
-	    $dao = new Keyword_Model_Entities_ExpandResult();
+	    $dao = new Db_ExpandResult();
 	     
 	    $data = array();
 	    $data["status"] = $status;
@@ -165,23 +193,36 @@ class Keyword_Model_Csv extends Db_Abstract{
                 continue;
 	        }
 	        
-	        $keyRes[$groupNm] = $keyword;
-	        if (count($keyRes) < 40 && $i++ < $count) {
-	            continue;
-	        }
-	        
-	        $fp = Com_Util::getLock("csvlock", 60);
-	        
-	        $posts = array(
-	                'site' => Com_Const::GOOGLE,
-	                'keyword' => urlencode(json_encode($keyRes))
-	        );
-	        
 	        try {
+	            
 	            if ($api === Com_Const::API_GOOGLE) {
+	                
+	                $fp = null;
+	                $keyRes = array();
+	                
+	                $keyRes[$groupNm] = $keyword;
+	                $posts = array(
+	                        'site' => Com_Const::GOOGLE,
+	                        'keyword' => urlencode(json_encode($keyRes))
+	                );
+	                
 	                $client->setUri($api.urlencode($keyword));
 	                $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE);
+	                
 	            } else {
+	                
+	                $keyRes[$groupNm] = $keyword;
+	                if (count($keyRes) < 40 && $i++ < $count) {
+	                    continue;
+	                }
+	                 
+	                $posts = array(
+	                        'site' => Com_Const::GOOGLE,
+	                        'keyword' => urlencode(json_encode($keyRes))
+	                );
+	                
+	                $fp = Com_Util::getLock("csvlock", 60);
+	                 
 	                $client->setUri($api);
 	                $client->setParameterPost($posts);
 	                $response = Com_Util::sendAPIRequest($client, Com_Const::GOOGLE, "POST");
@@ -191,7 +232,9 @@ class Keyword_Model_Csv extends Db_Abstract{
 	            $this->callApiTimes++;
 	        } catch (Exception $e) {}
 	        
-	        Com_Util::releaseLock($fp);
+	        if ($fp) {
+	            Com_Util::releaseLock($fp);
+	        }
 	        
             usleep(200 * 1000);
 	        
@@ -268,6 +311,13 @@ class Keyword_Model_Csv extends Db_Abstract{
 	 */
 	public function makeCsv($expand) {
 	    $csvdata = "";
+	    
+	    if($expand["bflag"] == 1) {
+	        $expand["result"] = gzuncompress($expand["resultb"]);
+	        $expand["level1"] = gzuncompress($expand["level1b"]);
+	        $expand["level2"] = gzuncompress($expand["level2b"]);
+	        $expand["level3"] = gzuncompress($expand["level3b"]);
+	    }
 	    
 	    $skAry = $this->parseSkStrToAry($expand["result"], "");
 	    
@@ -405,6 +455,10 @@ class Keyword_Model_Csv extends Db_Abstract{
 	// <groupNm>keyword&keyword&keyword
 	private function parseXMLResponseCsv($xmlContents, $groupNm, $keyword) {
 	    
+	    if (empty($xmlContents)) {
+	        return "";
+	    }
+	    
 	    $objContents = simplexml_load_string(mb_convert_encoding($xmlContents, "utf-8","SJIS-win"));
 	    $cnt = count($objContents->CompleteSuggestion);
 	    
@@ -413,18 +467,20 @@ class Keyword_Model_Csv extends Db_Abstract{
 	        return "";
 	    }
 	    
-	    $expandKeywords = "<".$groupNm.">";
+	    $expandGroup = "<".$groupNm.">";
+	    $expandKeywords = "";
 	    
 	    for($i = 0; $i < $cnt; $i++){
 	        $suggestKeyword = $objContents->CompleteSuggestion[$i]->suggestion;
 	        foreach($suggestKeyword->attributes() as $key => $val) {
 	            
 	            if($val != null && trim($val) != "" && $keyword != $val){
-	                $expandKeywords .= (string)$val."&";
+	                $expandKeywords .= Com_Util::filter($val)."&";
 	            }
 	        }
 	    }
-	    return rtrim($expandKeywords,"&");
+	    
+	    return empty($expandKeywords) ? "" : rtrim($expandGroup.$expandKeywords,"&");
 	}
 	
 	// -------------------------------------------------
@@ -435,4 +491,40 @@ class Keyword_Model_Csv extends Db_Abstract{
 	public function getCallApiTimes() {
 	    return $this->callApiTimes;
 	}
+	
+	// ============================= maintenance ++++++++++++++++++
+	public function compressCsv($idfrom, $idto) {
+	    
+	    $site = 1;
+	    
+	    $dao = new Db_ExpandResult();
+	    $rows = $dao->getRowsByIdRange($idfrom, $idto, $site);
+	    if ($rows == null) return;
+	    
+	    foreach ($rows as $row) {
+	        
+	        $data = array();
+	        $where = array();
+
+	        $data["result"] = null;
+	        $data["level1"] = null;
+	        $data["level2"] = null;
+	        $data["level3"] = null;
+	         
+	        $data["resultb"] = gzcompress($row["result"], 9);
+	        $data["level1b"] = gzcompress($row["level1"], 9);
+	        $data["level2b"] = gzcompress($row["level2"], 9);
+	        $data["level3b"] = gzcompress($row["level3"], 9);
+	        $data["bflag"] = 1;
+	         
+	        $where["historyid = ?"] = $row["historyid"];
+	        $where["site = ?"] = $site;
+	        $where["bflag = ?"] = 0;
+	        
+	        $dao->updateExpand($data, $where);
+ 	    }
+	    
+	}
+	
+	
 }

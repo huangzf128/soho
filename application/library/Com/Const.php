@@ -8,12 +8,18 @@ Class Com_Const
 	const CSV_EXPAND_LEVEL_MAX = 3;	           // CSV展開階層
 	const CSV_EXPAND_PER_WAITTIME = 30;        // API呼びだし待ちタイム
 	const CSV_EXPAND_PER_WAITTIME_G = 15;      // API呼びだし待ちタイム Google
-
+    const CSV_MAX_ORDER = 10;                   // 一度登録できる最大キーワード
+    
 	const MAX_RST_COUNT = 10;                  // 取得最大キーワード数
 	const EAPPID_RETRY_COUNT = 5;              // Yahoo専用
-	
+
 	const FILE_LOCK_TIMEOUT = 15;
 	const SESSION_EXPIRE = 1440;
+	
+	const SHOWTYPE_LAYOUT = 0;
+	const SHOWTYPE_HIDE = 1;
+	const SHOWTYPE_DIRECT = 2;
+	
 	
 	// -------------------------------------------
 	//     プログラム用 

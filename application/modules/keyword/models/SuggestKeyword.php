@@ -31,22 +31,19 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	/** 検索キーワードのブロック方法:  0:ブロックしない;1:完全一致;2:部分一致*/
     	$this->blockFlag = 2;
     	 
-//     	$this->suggestAry = array("", " ",
-//     			"あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ",
-//     			"さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と",
-//     			"な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
-//     			"ま", "み", "む", "め", "も", "や", "ゆ", "よ", 
-//     	        "ら", "り", "る", "れ",	"ろ", "わ",
-//     			"が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ",
-//     			"だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ",
-//     			"ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
-//     			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-//     			"k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-//     			"u", "v", "w", "x", "y", "z",
-//     			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
-//     	);
-    	
-    	$this->suggestAry = array("", " ", "か", "き", 
+    	$this->suggestAry = array("", " ",
+    			"あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ",
+    			"さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と",
+    			"な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
+    			"ま", "み", "む", "め", "も", "や", "ゆ", "よ", 
+    	        "ら", "り", "る", "れ",	"ろ", "わ",
+    			"が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ",
+    			"だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ",
+    			"ぱ", "ぴ", "ぷ", "ぺ", "ぽ",
+    			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+    			"k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+    			"u", "v", "w", "x", "y", "z",
+    			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
     	);
     }
     
@@ -60,25 +57,27 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     	return true;
 	}
         	
-    public function isBlockKeyword()
+    public function isBlockKeyword($keyword)
     {
     	$dir = "filter";
     	$name = "blockKeyword.txt";
     	$blockFile = $dir. DIRECTORY_SEPARATOR. $name;
     	$fileContent = file_get_contents($blockFile);
     	
+    	$fileContent = Com_Util::convertEOL($fileContent, PHP_EOL);
+    	
     	if($this->blockFlag === 1){
     		// 全部一致
-    		if(false !== strpos("\r\n".$fileContent, "\r\n".$this->keyword."\r\n")) {
-    			$this->errOutput("blockKeyword_log.txt", date("Y-m-d H:i:s")." : keyword=[".$this->keyword. "]; ip=[". $this->getClientIp()."];");
+    		if(false !== strpos(PHP_EOL.$fileContent, PHP_EOL.$keyword.PHP_EOL)) {
+    			$this->errOutput("blockKeyword_log.txt", date("Y-m-d H:i:s")." : keyword=[".$keyword. "]; ip=[". $this->getClientIp()."];");
     			return true;
     		}
     	} elseif ($this->blockFlag === 2) {
     		// 部分一致
-    		$blockKeywordAry = explode("\r\n", $fileContent);
+    		$blockKeywordAry = explode(PHP_EOL, $fileContent);
     		for($i = 0, $cnt = count($blockKeywordAry); $i < $cnt; $i++){
-	    		if(!empty($blockKeywordAry[$i]) && false !== strpos($this->keyword, $blockKeywordAry[$i])) {
-	    			$this->errOutput("blockKeyword_log.txt", date("Y-m-d H:i:s")." : keyword=[".$this->keyword. "]; ip=[". $this->getClientIp()."];");
+	    		if(!empty($blockKeywordAry[$i]) && false !== strpos($keyword, $blockKeywordAry[$i])) {
+	    			$this->errOutput("blockKeyword_log.txt", date("Y-m-d H:i:s")." : keyword=[".$keyword. "]; ip=[". $this->getClientIp()."];");
 	    			return true;
 	    		}
     		}    		
@@ -183,7 +182,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     }
     
     
-    
     public function getRecentKeyword() {
         $dao = new Keyword_Model_Entities_SearchHistory();
         $rows = $dao->getRecentKeyword($this->keyword);
@@ -209,12 +207,12 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         	$srchRst['kword'] = $this->keyword;
         	$srchRst['rstcnt'] = $this->rstCnt;
         	
-        	$srchRst['indextab'] = $this->indexTab;
-        	$srchRst['sk'] = $this->strSuggestKeywords;
+        	$srchRst['indextabb'] = gzcompress($this->indexTab, 9);
+        	$srchRst['skb'] = gzcompress($this->strSuggestKeywords, 9);
         	
         	$srchRst['clientip'] = $this->getClientIp(false); //略称形式
 
-        	return $searchHistoryEntity->regist($srchRst);
+        	return $searchHistoryEntity->registb($srchRst);
             
         } catch (Zend_Db_Adapter_Exception $e) {
         	throw $e;
@@ -277,9 +275,14 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     {
         try {
         	$searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
-        	$result = $searchHistoryEntity->getList(($currentNo - 1) * $this->pnum, $this->pnum);
-        	return $result;
-        		
+        	$rows = $searchHistoryEntity->getList(($currentNo - 1) * $this->pnum, $this->pnum);
+        	
+        	foreach ($rows as $index => $row) {
+        	    $rows[$index]['clientip'] = $this->parseCorrectIp($row["clientip"]);
+        	}
+        	 
+        	return $rows;
+        	
         } catch (Zend_Db_Adapter_Exception $e) {
             self::errOutput("error", $e->getMessage());
 
@@ -382,7 +385,7 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
 	    			
 	    			$fileName = mb_convert_encoding ( $time."_".$keyword, $this->serverEncode, "auto");
 	    			$from = "history/archive/".$fileName.".html";
-	    			copy($from, "history/deletearchive/".$fileName.".html");
+	    			//copy($from, "history/deletearchive/".$fileName.".html");
 	    			unlink($from);
 	    			
 	    			$result = $deleteEntity->deleteRowById($id);
@@ -399,6 +402,25 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         }        
     }
 
+    public function isBlockIp()
+    {
+        $dir = "filter";
+        $name = "blockip.txt";
+        $ipFile = $dir. DIRECTORY_SEPARATOR. $name;
+        $fileContent = file_get_contents($ipFile);
+        $ip = $this->get_client_ip();
+         
+        $ipAry = explode("\r\n", $fileContent);
+    
+        for($i = 0, $cnt = count($ipAry); $i < $cnt; $i++) {
+    
+            if(!empty($ipAry[$i])
+                    && $ipAry[$i] == $ip) {
+                        return true;
+                    }
+        }
+        return false;
+    }
 
     public function isValidIp()
     {
@@ -428,18 +450,67 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     
     function getClientIp($type = true)
     {
+// 		$ip = "[".$this->getServerVariable("HTTP_CLIENT_IP")."][".
+// 		      $this->getServerVariable("REMOTE_ADDR")."]";
+//     	return $ip;
+    	
     	if($type){
-    		$ip = "HTTP_CLIENT_IP=[".$this->getServerVariable("HTTP_CLIENT_IP")."];HTTP_X_FORWARDED_FOR=[".
-    		      $this->getServerVariable("HTTP_X_FORWARDED_FOR")."]; REMOTE_ADDR=[".
-    		      $this->getServerVariable("REMOTE_ADDR")."];";
+    	    $ip = "HTTP_CLIENT_IP=[".$this->getServerVariable("HTTP_CLIENT_IP")."];HTTP_X_FORWARDED_FOR=[".
+    	            $this->getServerVariable("HTTP_X_FORWARDED_FOR")."]; REMOTE_ADDR=[".
+    	            $this->getServerVariable("REMOTE_ADDR")."];";
     	}else{
-    		$ip = "[".$this->getServerVariable("HTTP_CLIENT_IP")."][".
-    		      $this->getServerVariable("HTTP_X_FORWARDED_FOR")."][".
-    		      $this->getServerVariable("REMOTE_ADDR")."]";
+    	    $ip = "[".$this->getServerVariable("HTTP_CLIENT_IP")."][".
+    	            $this->getServerVariable("HTTP_X_FORWARDED_FOR")."][".
+    	            $this->getServerVariable("REMOTE_ADDR")."]";
     	}
-    	return $ip;
+    	return $ip;    	
     }
+    
+    
 
+    private function parseCorrectIp($ip) {
+        $ary = array();
+        preg_match('/\[(.*)\]\[(.*)\]\[(.*)\]/u', $ip, $ary);
+    
+        if (count($ary) >= 4) {
+            if ($ary[2] != null) {
+                return $ary[2];
+            } else if ($ary[3] != null) {
+                return $ary[3];
+            }
+        }
+        
+        preg_match('/\[(.*)\]\[(.*)\]/u', $ip, $ary);
+        if (count($ary) == 3) {
+            if ($ary[1] != null) {
+                return $ary[1];
+            } else if ($ary[2] != null) {
+                return $ary[2];
+            }
+        }        
+        return $ip;
+    }
+    
+    private function get_client_ip() {
+        $ipaddress = '';
+    
+        if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    
+            else if(isset($_SERVER['REMOTE_ADDR']))
+                $ipaddress = $_SERVER['REMOTE_ADDR'];
+    
+                else if(isset($_SERVER['HTTP_X_FORWARDED']))
+                    $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+    
+                    else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+                        $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+    
+                        else
+                            $ipaddress = 'UNKNOWN';
+                            return $ipaddress;
+    }
+    
     private function getServerVariable($key) {
         if (isset($_SERVER[$key])) {
             return $_SERVER[$key];
@@ -472,10 +543,9 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         		$suggestKeyword = $objContents->CompleteSuggestion[$i]->suggestion;
         		foreach($suggestKeyword->attributes() as $key => $val) {
         			 
-        			if($keyword != $val){
+        			if($keyword != $val && false == $this->isBlockKeyword($val)){
         				$this->strSuggestKeywords.=
-        				"<li>
-            		     <span class='sugkey'>".(string)$val."</span>";
+        				"<li><span class='sugkey'>".Com_Util::filter($val)."</span>";
         				$this->strSuggestKeywords.="</li>";
         				$this->rstCnt++;
         			}
@@ -503,10 +573,9 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
         	$suggestKeyword = $objContents->CompleteSuggestion[$i]->suggestion;
         	foreach($suggestKeyword->attributes() as $key => $val) {
         		 
-        		if($this->keyword != $val){
+        		if($this->keyword != $val && false == $this->isBlockKeyword((string)$val)){
         			$this->strSuggestKeywords.=
-        			"<li>
-        		     <span class='sugkey'>".(string)$val."</span>";
+        			"<li><span class='sugkey'>".(string)$val."</span>";
         				
         			$this->strSuggestKeywords.="</li>";
         			$this->rstCnt++;
@@ -547,25 +616,6 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
     			$this->indexTab .= "<td><a href='#".$id."'>".$this->suggestAry[$id]."</a></td>";
     		}
     	}
-    }
-    
-    private function get_client_ip() {
-        $ipaddress = '';
-        if (isset($_SERVER['HTTP_CLIENT_IP']))
-            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        else if(isset($_SERVER['HTTP_X_FORWARDED']))
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
-            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-        else if(isset($_SERVER['HTTP_FORWARDED']))
-            $ipaddress = $_SERVER['HTTP_FORWARDED'];
-        else if(isset($_SERVER['REMOTE_ADDR']))
-            $ipaddress = $_SERVER['REMOTE_ADDR'];
-        else
-            $ipaddress = 'UNKNOWN';
-        return $ipaddress;
     }
     
     private function errOutput($errSql_file, $msg){
@@ -690,5 +740,151 @@ class Keyword_Model_SuggestKeyword extends Db_Abstract{
 	public function getRegistdt() {
 		return $this->registdt;
 	}
+
 	
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // maintenance
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	
+	// remove duplicate
+	public function delDuplicate($idFrom, $idTo) {
+        
+    	$count = 0;
+	    $searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
+	    
+	    for ($j = $idFrom; $j < $idTo; $j+=10000) {
+	        
+	        $rows = $searchHistoryEntity->getRowByIdRange($j, $j + 10000);
+	        $cnt = count($rows);
+	        
+	        for($i = 0; $i < $cnt; $i++) {
+	            $row = $rows[$i];
+	            $rst = $searchHistoryEntity->getDuplicateCount($row["kword"], $row["id"]);
+	            if ($rst > 0) {
+	                $this->deleteKeywordList($row["id"]);
+	                //echo $row[id]."<br/>";
+	                $count++;
+	            }
+	        }
+	        echo $j;
+	    }
+        echo $count;
+	}
+
+    // remove 0 record
+    public function delSearchHistoryZero($registdt)
+    {
+        try {
+        	$searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
+        	$rows = $searchHistoryEntity->getZeroRowByRegDtRange($registdt);
+        	$cnt = count($rows);
+            
+            $idAry = "";
+            for($i = 0; $i < $cnt; $i++) {
+                $row = $rows[$i];
+                $idAry[] = $row["id"];
+            }
+
+            $this->deleteKeywordList(implode(",", $idAry));
+        	
+        } catch (Zend_Db_Adapter_Exception $e) {
+        	throw $e;
+        } catch (Zend_Exception $e) {
+        	throw $e;
+        }
+    }
+    
+    // --------------- backup csv --------------------
+    
+    // save to csv
+    public function saveToCsv($idFrom, $idTo) {
+         
+        $count = 0;
+        $searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
+    
+        $up = 1000;
+         
+        for ($j = $idFrom; $j < $idTo; $j+=$up) {
+    
+            $csvs = array();
+    
+            $rows = $searchHistoryEntity->getRowByIdRange($j, $j + $up);
+            $cnt = count($rows);
+            for($i = 0; $i < $cnt; $i++) {
+                $row = $rows[$i];
+                $csvs[] = array($row["id"], $row["registdt"], $row["kword"], $row["rstcnt"], $row["indextab"], $row["sk"], $row["clientip"]);
+            }
+    
+            // create csv
+            $filename = $j. "-". ($j + $up);
+            $path = "history/csv/csv_".$filename.".csv";
+            $f = fopen($path, "w");
+            if ( $f ) {
+                foreach($csvs as $line){
+                    fputcsv($f, $line);
+                }
+            }
+            fclose($f);
+        }
+        echo $count;
+    }
+    
+    public function csvToDB($folder, $filenum) {
+        $csvPath = "history/".$folder."/csv_{filenum}.csv";
+        $searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
+         
+        $count = 0;
+        $num = explode("-", $filenum);
+        
+        while($count < 10) {
+            
+            $from = $num[0] + 1000 * $count;
+            $to = $num[1] + 1000 * $count;
+            
+            $path = str_replace("{filenum}", $from."-".$to, $csvPath);
+            
+            if (($handle = fopen($path, "r")) !== FALSE) {
+                 
+                while (($line = fgetcsv($handle)) !== FALSE) {
+                    $line[4] = gzcompress($line[4], 9);
+                    $line[5] = str_replace("        		     <span class='sugkey'>", "<span class='sugkey'>", $line[5]);
+                    $line[5] = gzcompress($line[5], 9);
+                    $searchHistoryEntity->registbWithId($line);
+                }
+                fclose($handle);
+            }
+            $count++;
+            
+            echo $path."<br/>";
+            echo $line[0]."<br/>";
+        }
+        
+    }
+    
+    public function compressDb() {
+
+        $searchHistoryEntity = new Keyword_Model_Entities_SearchHistory();
+         
+        $rows = $searchHistoryEntity->getListForBflag();
+        
+        for ($i = 0; $i < count($rows); $i++) {
+            $data = array();
+            $where = array();
+            
+            $row = $rows[$i];
+            
+            $data["indextab"] = null;
+            $data["indextabb"] = gzcompress($row["indextab"], 9);
+            $data["sk"] = null;
+            $data["skb"] = gzcompress($row["sk"], 9);
+            $data["bflag"] = 1;
+            
+            $where["id"] = $row["id"];
+            
+            $searchHistoryEntity->updateb($data, $where);
+        }
+    }
+     
 }

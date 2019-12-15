@@ -100,7 +100,7 @@ if (Com_Util::isCsvServiceEnabled(Com_Const::SERVICE_CSV_G)) {
 
     echo '</div>';
 
-    if ($this->layout()->usertype == "9") {
+    if (Com_Util::isAdmin($this->layout()->usertype)) {
         echo '<div id="user-manager" >User管理</div>';
     } else {
         echo '<div id="csv-download" >CSV管理</div>';
@@ -239,10 +239,18 @@ var opts = {
 		};
 
 var onFrmSubmit = function(){
-	$("#bloading").css("display", "block");
-	var target = document.getElementById('bloading');
-	var spinner = new Spinner(opts).spin(target);
- 	return true;
+
+	if ( $("#keywordFrm").data("issubmit") != 1 ) {
+
+		$("#but").attr("disabled", true);
+		$("#keywordFrm").data("issubmit", 1);
+		
+		$("#bloading").css("display", "block");
+		var target = document.getElementById('bloading');
+		var spinner = new Spinner(opts).spin(target);
+	 	return true;
+	}
+	return false;
 }
 
 $(function(){

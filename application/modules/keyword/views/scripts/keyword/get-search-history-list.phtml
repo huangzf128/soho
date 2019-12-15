@@ -12,8 +12,11 @@
 <table id="historytab" align="center">
 <tr>
     <td width="20%">検索日時</d>
-    <td width="55%">キーワード</td>
-    <td width="25%">サジェスト件数</td>
+    <td width="45%">キーワード</td>
+	<?php if (Com_Util::isAdmin($this->usertype)) {  ?>
+		<td width="20%"><u>IP</u></td>
+	<?php }?>
+    <td width="15%">サジェスト数</td>
 </tr>
 
 <?php 
@@ -23,9 +26,12 @@
     	//$id = $row['id'];
     	
         echo '<tr><td>'.$row['registdt'].'</td>'.
-            '<td><a href="/history/archive/'.$time.'_'.$keyword.'">'.$keyword.'</a><span style="display:none;">'.
-            $row['id'].'</span><span style="display:none;">'.$time.'</span></td>'.
-            '<td>'.$row['rstcnt'].'件</td></tr>';
+            '<td><a href="/history/archive/'.$time.'_'.$keyword.'">'.$keyword.'</a><span style="display:none;">'.$row['id'].'</span><span style="display:none;">'.$time.'</span></td>';
+            if (Com_Util::isAdmin($this->usertype)) {
+                echo '<td>'.$row['clientip'].'</td>';
+            }
+            
+        echo  '<td>'.$row['rstcnt'].'件</td></tr>';
     };
 ?>
 

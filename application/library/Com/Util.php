@@ -46,11 +46,36 @@ Class Com_Util
 	    return ($service["zero"] == 1);
 	}
 	
+	public static function isLoggedUser($usertype) {
+	    return isset($usertype);
+	}
+	
+	public static function isAdmin($usertype) {
+	    
+	    return Com_Util::isLoggedUser($usertype) && $usertype == Com_Const::USER_ADMIN;
+	}
+	
 	public static function filter($str) {
 	    $search = array("&");
 	    $replace = array("＆");
 	    
 	    return str_replace($search, $replace, $str);
+	}
+	
+	public static function getHistoryTableName($site) {
+	    
+	    if ($site == Com_Const::AMAZON) {
+	        $name = "searchhistoryaz";
+	    } elseif ($site == Com_Const::BING) {
+	        $name = "searchhistorybs";
+	    } elseif ($site == Com_Const::YAHOO) {
+	        $name = "searchhistoryya";
+	    } elseif ($site == Com_Const::YOUTUBE) {
+	        $name = "searchhistoryyt";
+	    } elseif ($site == Com_Const::GOOGLE) {
+	        $name = "searchhistory";
+	    }
+	    return $name;
 	}
 	
 	public static function errOutput($errSql_file, $sql){
@@ -72,6 +97,10 @@ Class Com_Util
 	    }
 	}
 	
+	public static function convertEOL($string, $to = "\n")
+	{
+	    return preg_replace("/\r\n|\r|\n/", $to, $string);
+	}
 	
 	/**
 	 * APIを呼んで、サジェストキーワードを取得する

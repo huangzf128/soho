@@ -26,14 +26,16 @@ class Keyword_CsvController extends Zend_Controller_Action
     public function indexAction()
     {
         if (Com_Util::isCsvServiceEnabled(Com_Const::SERVICE_CSV_G)) {
+            
             $csvModel = new Keyword_Model_Csv();
             $orders = $csvModel->getCsvOrderList($this->userid);
             $this->view->orders = $orders;
+            
         } else {
             $this->_redirect('/keyword/index');
         }
     }
-
+    
     public function csvFileOrderAction()
     {
         $this->_helper->layout->disableLayout();
@@ -49,6 +51,13 @@ class Keyword_CsvController extends Zend_Controller_Action
         try {
             // 予約に入れる
             $csvModel = new Keyword_Model_Csv();
+            
+            $execuintCount = $csvModel->getWaitingCount($this->userid);
+            if($execuintCount > Com_Const::CSV_MAX_ORDER) {
+                echo "2";
+                return;
+            }
+            
             $result = $csvModel->registCsvOrder($this->userid, $historyid);
             
             if ($result) {
@@ -208,20 +217,24 @@ class Keyword_CsvController extends Zend_Controller_Action
     public function deleteAction() {
         
         $historyid = $this->getRequest()->id;
+        $next = $this->getRequest()->next;
         
         $csvModel = new Keyword_Model_Csv();
         $csvModel->deleteOrderCsv($historyid, $this->userid);
         
-        // 待ち中キーワードを取得する
-        $historyid = $this->getNextHistoryid($this->userid);
-        if (!empty($historyid)) {
-            // 非同期処理
-            if (Com_Util::isHttps()) {
-                $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Result-Ajax?historyid=".$historyid."&userid=".$this->userid);
-            } else {
-                $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Result-Ajax?historyid=".$historyid."&userid=".$this->userid);
+        if ($next == 1 && false == $csvModel->hasExecutingCsv($this->userid)) {
+            
+            // 待ち中キーワードを取得する
+            $historyid = $this->getNextHistoryid($this->userid);
+            if (!empty($historyid)) {
+                // 非同期処理
+                if (Com_Util::isHttps()) {
+                    $url_list = array("https://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Result-Ajax?historyid=".$historyid."&userid=".$this->userid);
+                } else {
+                    $url_list = array("http://".$_SERVER['HTTP_HOST']."/keyword/csv/expand-Result-Ajax?historyid=".$historyid."&userid=".$this->userid);
+                }
+                Com_Util::sendMulitRequest($url_list);   
             }
-            Com_Util::sendMulitRequest($url_list);   
         }
         
         $orders = $csvModel->getCsvOrderList($this->userid);
@@ -280,6 +293,12 @@ class Keyword_CsvController extends Zend_Controller_Action
         try {
             // get history
             $expandRst = $csvModel->getExpandResult($historyid);
+            if ($expandRst["bflag"] == 1) {
+                $expandRst["result"] = gzuncompress($expandRst["resultb"]);
+                $expandRst["level1"] = gzuncompress($expandRst["level1b"]);
+                $expandRst["level2"] = gzuncompress($expandRst["level2b"]);
+                $expandRst["level3"] = gzuncompress($expandRst["level3b"]);
+            }
             $expandKeywords = $expandRst["result"];
             //$interruptinfo = explode("-", $expandRst["interruptinfo"]);
             $interruptinfo = $this->splitInterruptinfo("-", $expandRst["interruptinfo"]);

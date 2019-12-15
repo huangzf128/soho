@@ -54,7 +54,7 @@ class Keyword_UserController extends Zend_Controller_Action
         
         
         if ($user != FALSE && $user['password'] == $password && strpos($user["site"], $site) !== false) {
-            $userinfo = array("id" => $id, "name" => $user["name"]);
+            $userinfo = array("id" => $id, "name" => $user["name"], "type" => $user["type"]);
         } else {
             $userinfo = array("id" => $id, "name" => "failure");
         }

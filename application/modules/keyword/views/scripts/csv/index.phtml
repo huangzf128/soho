@@ -14,31 +14,34 @@ if ($this->orders) {
         $time = str_replace(array("/", " ", ":", "-"), "", $row['registdt']);
         $status = $row["status"];
         
-        echo   '<tr>'.
-        	       '<td><a href="/history/archive/'.$time.'_'.$keyword.'">'.$keyword.'</a>'.
-        	           '<span style="display:none;">'.$row['historyid'].':'.$time.'</span>'.
-                   '</td>'.
-        	       '<td>'.$row["updatedt"].'</td>';
+        echo   '<tr>';
+        
+        if ($row["registdt"] == null) {
+            echo    '<td>'.$keyword.'</td>';
+        } else {
+            echo    '<td><a href="/history/archive/'.$time.'_'.$keyword.'">'.$keyword.'</a>'.
+                    '<span style="display:none;">'.$row['historyid'].':'.$time.'</span>'.
+                    '</td>';
+        }
+        echo	   '<td>'.$row["updatedt"].'</td>';
+        
+        $now = new DateTime;
+        $lastupdatedt = new DateTime($row["lastupdatedt"]);
+        $diff_min = ($now->format("U") - $lastupdatedt->format("U")) / 60;
         
         if ($status == null) {
             echo '<td>処理待ち</td>';
-            echo '<td>&nbsp;</td>';
-        } else if ($status == 0) {
+            echo '<td>'.("<a href='/keyword/csv/delete?next=0&id=".$row["historyid"]."'>削除</a>").'</td>';
+        } else if ($status == 0 && $diff_min < 5) {
             echo '<td>処理中</td>';
-            $now = new DateTime;
-            $lastupdatedt = new DateTime($row["lastupdatedt"]);
-            $diff_min = ($now->format("U") - $lastupdatedt->format("U")) / 60;
-            echo '<td>'.($diff_min > 3 ? "<a href='/keyword/csv/delete?id=".$row["historyid"]."'>削除</a>": "").'</td>';
+            echo '<td>&nbsp;</td>';
         } else if ($status == 1) {
             echo
             '<td><a href="/keyword/csv/download?id='.$row["historyid"].'" >Download</a></td>';
             echo '<td>&nbsp;</td>';
         } else {
             echo '<td>エラー</td>';
-            $now = new DateTime;
-            $lastupdatedt = new DateTime($row["lastupdatedt"]);
-            $diff_min = ($now->format("U") - $lastupdatedt->format("U")) / 60;
-            echo '<td>'.($diff_min > 3 ? "<a href='/keyword/csv/delete?id=".$row["historyid"]."'>削除</a>": "").'</td>';
+            echo '<td>'.("<a href='/keyword/csv/delete?next=1&id=".$row["historyid"]."'>削除</a>").'</td>';
         }
         
         echo '</tr>';
