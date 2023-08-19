@@ -1,0 +1,14 @@
+# SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+AddType application/x-ms-application .application
+AddType application/x-ms-manifest .manifest
+AddType application/octet-stream .deploy
+
+RewriteEngine on
+
+#RewriteCond %{HTTP:Authorization} ^(.*)
+#RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+
+
+RewriteRule ^$ public/ [L]
+RewriteRule (.*) public/$1 [L]
+

@@ -1,0 +1,141 @@
+{% extends "top.html" %}
+
+{% block content %}
+<style>
+	div img {
+		max-width: 300px;
+		max-height: 300px;
+	}
+</style>
+
+<!-- ======= Hero Section ======= -->
+<section id="hero" class="d-flex align-items-center">
+
+	<div class="container">
+		<div class="row">
+		</div>
+	</div>
+
+</section><!-- End Hero -->
+
+<main id="main">
+
+	<!-- ======= Cta Section ======= -->
+	<section id="cta" class="cta">
+		<div class="container" data-aos="zoom-in">
+			<form id="frm" method="post" action="reverse" enctype="multipart/form-data">
+				<div class="d-flex flex-row">
+					<div class="text-right text-lg-start">
+						<h3></h3>
+						<br />
+						<p>
+							キーワード：　<input type="file" id="image" name="image" />
+						</p>
+					</div>
+					<div class="cta-btn-container text-center">
+						<a class="cta-btn align-middle" href="#" id="a-submit">検索</a>
+					</div>
+				</div>
+			</form>
+		</div>
+	</section>
+	<!-- End Cta Section -->
+
+
+	<!-- ======= Pricing Section ======= -->
+	<section id="pricing" class="pricing section-bg">
+		<div class="container" data-aos="fade-up">
+
+			<div class="section-title">
+				<h2>検索結果</h2>
+				<p>
+
+				</p>
+			</div>
+
+			<div class="row justify-content-center">
+
+				<div class="col-lg-12" data-aos="fade-up" data-aos-delay="100">
+					<div class="box featured container">
+						<h3>Amazon検索結果</h3>
+						<!--pagesWithMatchingImages-->
+						<h4>Amazonの類似商品</h4>
+						{% for pagesWithMatchingImage in pagesWithMatchingImages %}
+						<div class="d-flex flex-wrap">
+							<div>
+								<a href="{{pagesWithMatchingImage.url}}" target="_blank">{{pagesWithMatchingImage.pageTitle}}</a>
+							</div>
+						</div>
+						{% endfor %}
+
+						<!-- <h4>FullMatchingImages</h4>
+						<div class="d-flex flex-wrap">
+							{% for fullMatchingImage in fullMatchingImages %}
+							<div>
+								<img src="{{fullMatchingImage.url}}" onerror="hideImg(this)"/>
+							</div>
+							{% endfor %}
+						</div>
+
+						<h4>partialMatchingImages</h4>
+						<div class="d-flex flex-wrap">
+							{% for partialMatchingImage in partialMatchingImages %}
+							<div>
+								<img src="{{partialMatchingImage.url}}" onerror="hideImg(this)"/>
+							</div>
+							{% endfor %}
+						</div> -->
+
+						<!-- <h4>visuallySimilarImages</h4>
+						<div class="d-flex flex-wrap">
+							{% for visuallySimilarImage in visuallySimilarImages %}
+							<div>
+								<img src="{{visuallySimilarImage.url}}" onerror="hideImg(this)"/>
+							</div>
+							{% endfor %}
+						</div> -->
+						
+						<!--webEntities-->
+						<h4>キーワードでAmazon検索</h4>
+						<span style="color:wheat;">下記のリンクをクリックして、Amazonでキーワードを調べる</span>
+						<div class="d-flex flex-column">
+							{% for webEntity in webEntities %}
+							<div style="color: white;">
+								<a href="https://www.amazon.co.jp/s?k={{webEntity.description}}" target="_blank"> {{webEntity.description}} ( {{webEntity.score}} )</a>
+							</div>
+							{% endfor %}
+						</div>
+
+						<!-- <h4>キーワード(labels)</h4>
+						<div class="d-flex flex-column">
+							{% for label in labels %}
+							<div style="color: white;">
+								<a href="https://www.amazon.co.jp/s?k={{label.description}}" target="_blank">{{label.description}}({{label.score}})</a>
+							</div>
+							{% endfor %}
+						</div> -->
+
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+	</section><!-- End Pricing Section -->
+
+
+
+</main><!-- End #main -->
+<script>
+	function hideImg(img) {
+		$(img).hide();
+	}
+</script>
+{% endblock %}
+
+{% block script %}
+$('#a-submit').click(function() {
+	$('#frm').submit();
+});
+
+{% endblock %}
