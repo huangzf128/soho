@@ -104,14 +104,16 @@ final class HomeAction extends BaseAction
 
     public function search(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        putenv('GOOGLE_APPLICATION_CREDENTIALS=F:/repo/searchItem/public/resource/searchitem-395801-753ee51e2a7f.json');
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=D:/repo/soho/searchItem/public/resource/searchitem-395801-753ee51e2a7f.json');
 
 		if ($_FILES['image']['error'] === UPLOAD_ERR_OK) {
 			$imageAnnotator = new ImageAnnotatorClient();
 			// $path = 'assets/img/glasses.jpg';
 			$path = $_FILES["image"]["tmp_name"];
 	
-			move_uploaded_file($path, 'images/' + $_FILES["image"]["name"]);
+			move_uploaded_file($path, 'images/'.$_FILES["image"]["name"]);
+
+			$path = 'images/'.$_FILES["image"]["name"];
 
 			$results = $this->webDetection($imageAnnotator, $path);
 			// $results = $this->detectLabel($imageAnnotator, $path);
